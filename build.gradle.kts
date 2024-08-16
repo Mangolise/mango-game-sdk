@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-group = "org.krystilize"
+group = "net.mangolise"
 version = "1.0-SNAPSHOT"
 
 repositories {
