@@ -12,14 +12,15 @@ repositories {
 
 dependencies {
     compileOnly("net.minestom:minestom-snapshots:6c5cd6544e")
+    implementation("ch.qos.logback:logback-classic:1.5.7")
 }
 
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            groupId = "net.mangolise.gamesdk"
-            artifactId = "library"
-            version = "1.1"
+            groupId = "com.github.Mangolise"
+            artifactId = "mango-game-sdk"
+            version = "main-SNAPSHOT"
 
             from(components["java"])
         }
