@@ -10,4 +10,8 @@ public class Util {
     public static UUID createFakeUUID(String name) {
         return UUID.nameUUIDFromBytes(("OfflinePlayer: " + name).getBytes());
     }
+
+    public static int getConfiguredPort() {
+        return Integer.parseInt(System.getenv().getOrDefault("SERVER_PORT", "25565"));
+    }
 }
