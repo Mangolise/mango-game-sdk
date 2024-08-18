@@ -22,6 +22,10 @@ public class Util {
         return Integer.parseInt(System.getenv().getOrDefault("SERVER_PORT", "25565"));
     }
 
+    public static boolean useBungeeCord() {
+        return Boolean.parseBoolean(System.getenv().getOrDefault("USE_BUNGEECORD", "false"));
+    }
+
     /**
      * Get the highest block at the given x and z coordinates.
      * @param instance the instance to check.
