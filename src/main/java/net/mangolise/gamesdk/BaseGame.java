@@ -1,10 +1,9 @@
 package net.mangolise.gamesdk;
 
-import net.minestom.server.tag.Tag;
 import net.minestom.server.tag.TagHandler;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class BaseGame<C> implements Game<C> {
+public abstract class BaseGame<C extends Record> implements Game {
 
     protected TagHandler tagHandler = TagHandler.newHandler();
 

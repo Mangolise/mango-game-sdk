@@ -1,13 +1,36 @@
 package net.mangolise.gamesdk;
 
-import net.mangolise.gamesdk.config.ServerConfig;
-import net.minestom.server.entity.Player;
 import net.minestom.server.tag.Taggable;
 
-import java.util.Set;
+import java.util.List;
 
-public interface Game<C> extends Taggable {
-    void start(Set<Player> players);
+public interface Game extends Taggable {
 
-    C config();
+    /**
+     * Sets up the game by first initializing all features.
+     */
+    void setup();
+
+    /**
+     * The game's configuration.
+     */
+    Record config();
+
+    /**
+     * The game's features.
+     */
+    List<Feature<?>> features();
+
+    interface Feature<G extends Game> {
+        void setup(Context<G> context);
+
+        interface Context<G extends Game> {
+            G game();
+
+            /**
+             * Gets a previously loaded feature. Throws an exception if the feature is not yet loaded.
+             */
+            Feature<G> feature(Class<? extends Feature<? super G>> feature);
+        }
+    }
 }
