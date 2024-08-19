@@ -27,8 +27,8 @@ publishing {
             name = "serbleMaven"
             url = uri("https://maven.serble.net/snapshots/")
             credentials {
-                username = System.getenv("SERBLE_REPO_USERNAME")!!
-                password = System.getenv("SERBLE_REPO_PASSWORD")!!
+                username = System.getenv("SERBLE_REPO_USERNAME")?:""
+                password = System.getenv("SERBLE_REPO_PASSWORD")?:""
             }
             authentication {
                 create<BasicAuthentication>("basic")
