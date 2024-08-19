@@ -48,6 +48,6 @@ public class Util {
      * @return the spawn position.
      */
     public static Pos getSpawnPosition(Instance instance) {
-        return new Pos(0, getHighestBlock(instance, 0, 0) + 2, 0);
+        return new Pos(0.5, getHighestBlock(instance, 0, 0) + 2, 0.5);
     }
 }
