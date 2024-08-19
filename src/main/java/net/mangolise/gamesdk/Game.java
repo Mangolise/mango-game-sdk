@@ -4,7 +4,11 @@ import net.minestom.server.tag.Taggable;
 
 import java.util.List;
 
-public interface Game extends Taggable {
+/**
+ * There will only ever be a single instance of this class per jvm runtime.
+ * DO NOT run more than one at a time.
+ */
+public sealed interface Game extends Taggable permits BaseGame {
 
     /**
      * Sets up the game by first initializing all features.
@@ -31,6 +35,11 @@ public interface Game extends Taggable {
              * Gets a previously loaded feature. Throws an exception if the feature is not yet loaded.
              */
             Feature<G> feature(Class<? extends Feature<? super G>> feature);
+
+            /**
+             * Adds a task that is run on game shutdown.
+             */
+            void cleanup(Runnable cleanupTask);
         }
     }
 }
