@@ -15,6 +15,10 @@ repositories {
 dependencies {
     compileOnly("net.minestom:minestom-snapshots:6c5cd6544e")
     implementation("ch.qos.logback:logback-classic:1.5.7")
+
+    // gradle task
+    compileOnly(gradleApi())
+    compileOnly("dev.hollowcube:polar:1.11.1")
 }
 
 publishing {
