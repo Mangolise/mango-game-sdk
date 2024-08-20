@@ -1,10 +1,12 @@
 package net.mangolise.gamesdk.block;
 
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.ServerPacket;
 import net.minestom.server.network.packet.server.play.BlockActionPacket;
+import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.TaskSchedule;
 
 public class MoveablePiston {
@@ -63,6 +65,7 @@ public class MoveablePiston {
 
         ServerPacket packet = new BlockActionPacket(pos, (byte)0, actionParam, Block.STICKY_PISTON);
         instance.sendGroupedPacket(packet);
+        instance.playSound(Sound.sound(SoundEvent.BLOCK_PISTON_EXTEND, Sound.Source.BLOCK, 0.5f, 1.0f), pos);
 
         instance.scheduler().scheduleTask(() -> {
             instance.setBlock(pos.add(normal), Block.PISTON_HEAD
@@ -82,6 +85,7 @@ public class MoveablePiston {
 
         ServerPacket packet = new BlockActionPacket(pos, (byte)1, actionParam, Block.STICKY_PISTON);
         instance.sendGroupedPacket(packet);
+        instance.playSound(Sound.sound(SoundEvent.BLOCK_PISTON_CONTRACT, Sound.Source.BLOCK, 1.0f, 1.0f), pos);
 
         instance.scheduler().scheduleTask(() -> {
             instance.setBlock(pos.add(normal), Block.SLIME_BLOCK);
