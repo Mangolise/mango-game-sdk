@@ -1,12 +1,16 @@
 package net.mangolise.gamesdk.util;
 
 import net.hollowcube.polar.PolarLoader;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Player;
 import net.minestom.server.instance.IChunkLoader;
 import net.minestom.server.instance.Instance;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.UUID;
 
 public class Util {
@@ -66,5 +70,10 @@ public class Util {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void showTitle(Player player, int fadeIn, int stay, int fadeOut, Component title, Component subtitle) {
+        Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut));
+        player.showTitle(Title.title(title, subtitle, times));
     }
 }
