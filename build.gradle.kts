@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("java-library")
     id("maven-publish")
 }
 
@@ -15,11 +16,16 @@ repositories {
 dependencies {
     compileOnly("net.minestom:minestom-snapshots:6c5cd6544e")
     implementation("ch.qos.logback:logback-classic:1.5.7")
+    api("dev.hollowcube:polar:1.11.1")
 
     // gradle task
     compileOnly(gradleApi())
-    compileOnly("dev.hollowcube:polar:1.11.1")
 }
+
+java {
+    withSourcesJar()
+}
+
 
 publishing {
     repositories {
