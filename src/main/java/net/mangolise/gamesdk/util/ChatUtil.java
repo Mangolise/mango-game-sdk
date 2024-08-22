@@ -18,7 +18,7 @@ public class ChatUtil {
         Component component = Component.empty();
         StringBuilder currentSection = new StringBuilder();
 
-        NamedTextColor colour = NamedTextColor.WHITE;
+        NamedTextColor color = NamedTextColor.WHITE;
         TextDecoration decoration = null;
         for (int i = 0; i < message.length(); i++) {
             if (message.charAt(i) != COLOR_CHAR || !VALID_COLORS.contains(String.valueOf(message.charAt(i + 1)))) {
@@ -28,106 +28,51 @@ public class ChatUtil {
 
             // Apply prev section
             if (!currentSection.isEmpty()) {
-                component = component.append(Component.text(currentSection.toString(), colour, decoration));
+                component = applyComponent(component, currentSection, color, decoration);
                 currentSection = new StringBuilder();
             }
 
-            char modifier = message.charAt(i + 1);
+            i++;
+
+            char modifier = message.charAt(i);
+            decoration = null;
             switch (modifier) {
-                case '0':
-                    colour = NamedTextColor.BLACK;
-                    break;
-
-                case '1':
-                    colour = NamedTextColor.DARK_BLUE;
-                    break;
-
-                case '2':
-                    colour = NamedTextColor.DARK_GREEN;
-                    break;
-
-                case '3':
-                    colour = NamedTextColor.DARK_AQUA;
-                    break;
-
-                case '4':
-                    colour = NamedTextColor.DARK_RED;
-                    break;
-
-                case '5':
-                    colour = NamedTextColor.DARK_PURPLE;
-                    break;
-
-                case '6':
-                    colour = NamedTextColor.GOLD;
-                    break;
-
-                case '7':
-                    colour = NamedTextColor.GRAY;
-                    break;
-
-                case '8':
-                    colour = NamedTextColor.DARK_GRAY;
-                    break;
-
-                case '9':
-                    colour = NamedTextColor.BLUE;
-                    break;
-
-                case 'a':
-                    colour = NamedTextColor.GREEN;
-                    break;
-
-                case 'b':
-                    colour = NamedTextColor.AQUA;
-                    break;
-
-                case 'c':
-                    colour = NamedTextColor.RED;
-                    break;
-
-                case 'd':
-                    colour = NamedTextColor.LIGHT_PURPLE;
-                    break;
-
-                case 'e':
-                    colour = NamedTextColor.YELLOW;
-                    break;
-
-                case 'f':
-                    colour = NamedTextColor.WHITE;
-                    break;
-
-                case 'k':
-                    decoration = TextDecoration.OBFUSCATED;
-                    break;
-
-                case 'l':
-                    decoration = TextDecoration.BOLD;
-                    break;
-
-                case 'm':
-                    decoration = TextDecoration.STRIKETHROUGH;
-                    break;
-
-                case 'n':
-                    decoration = TextDecoration.UNDERLINED;
-                    break;
-
-                case 'o':
-                    decoration = TextDecoration.ITALIC;
-                    break;
-
-                case 'r':
-                    decoration = null;
-                    break;
+                case '0' -> color = NamedTextColor.BLACK;
+                case '1' -> color = NamedTextColor.DARK_BLUE;
+                case '2' -> color = NamedTextColor.DARK_GREEN;
+                case '3' -> color = NamedTextColor.DARK_AQUA;
+                case '4' -> color = NamedTextColor.DARK_RED;
+                case '5' -> color = NamedTextColor.DARK_PURPLE;
+                case '6' -> color = NamedTextColor.GOLD;
+                case '7' -> color = NamedTextColor.GRAY;
+                case '8' -> color = NamedTextColor.DARK_GRAY;
+                case '9' -> color = NamedTextColor.BLUE;
+                case 'a' -> color = NamedTextColor.GREEN;
+                case 'b' -> color = NamedTextColor.AQUA;
+                case 'c' -> color = NamedTextColor.RED;
+                case 'd' -> color = NamedTextColor.LIGHT_PURPLE;
+                case 'e' -> color = NamedTextColor.YELLOW;
+                case 'f', 'r' -> color = NamedTextColor.WHITE;
+                case 'k' -> decoration = TextDecoration.OBFUSCATED;
+                case 'l' -> decoration = TextDecoration.BOLD;
+                case 'm' -> decoration = TextDecoration.STRIKETHROUGH;
+                case 'n' -> decoration = TextDecoration.UNDERLINED;
+                case 'o' -> decoration = TextDecoration.ITALIC;
             }
+        }
+
+        if (!currentSection.isEmpty()) {
+            component = applyComponent(component, currentSection, color, decoration);
         }
 
         return component;
     }
 
-    public static String colourise(String message) {
-        return message.replace('&', SPECIAL_CHAR);
+    private static Component applyComponent(Component component, StringBuilder currentSection, NamedTextColor color, TextDecoration decoration) {
+        if (decoration == null) {
+            return component.append(Component.text(currentSection.toString(), color));
+        } else {
+            return component.append(Component.text(currentSection.toString(), color, decoration));
+        }
     }
 }
