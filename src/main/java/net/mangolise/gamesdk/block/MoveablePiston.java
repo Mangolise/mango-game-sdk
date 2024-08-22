@@ -9,6 +9,8 @@ import net.minestom.server.network.packet.server.play.BlockActionPacket;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.TaskSchedule;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class MoveablePiston {
     private final Instance instance;
     private final Vec pos;
@@ -65,7 +67,8 @@ public class MoveablePiston {
 
         ServerPacket packet = new BlockActionPacket(pos, (byte)0, actionParam, Block.STICKY_PISTON);
         instance.sendGroupedPacket(packet);
-        instance.playSound(Sound.sound(SoundEvent.BLOCK_PISTON_EXTEND, Sound.Source.BLOCK, 0.5f, 1.0f), pos);
+        instance.playSound(Sound.sound(SoundEvent.BLOCK_PISTON_EXTEND, Sound.Source.BLOCK, 0.5f,
+                ThreadLocalRandom.current().nextFloat(0.6f, 0.85f)), pos);
 
         instance.scheduler().scheduleTask(() -> {
             instance.setBlock(pos.add(normal), Block.PISTON_HEAD
@@ -85,7 +88,8 @@ public class MoveablePiston {
 
         ServerPacket packet = new BlockActionPacket(pos, (byte)1, actionParam, Block.STICKY_PISTON);
         instance.sendGroupedPacket(packet);
-        instance.playSound(Sound.sound(SoundEvent.BLOCK_PISTON_CONTRACT, Sound.Source.BLOCK, 1.0f, 1.0f), pos);
+        instance.playSound(Sound.sound(SoundEvent.BLOCK_PISTON_CONTRACT, Sound.Source.BLOCK, 0.5f,
+                ThreadLocalRandom.current().nextFloat(0.6f, 0.8f)), pos);
 
         instance.scheduler().scheduleTask(() -> {
             instance.setBlock(pos.add(normal), Block.SLIME_BLOCK);
