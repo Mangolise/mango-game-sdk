@@ -60,7 +60,7 @@ public class Util {
         return new Pos(0.5, getHighestBlock(instance, 0, 0) + 2, 0.5);
     }
 
-    public static IChunkLoader getPolarLoaderFromResource(String path) {
+    public static PolarLoader getPolarLoaderFromResource(String path) {
         try {
             InputStream file = ClassLoader.getSystemResourceAsStream(path);
             if (file == null) {
