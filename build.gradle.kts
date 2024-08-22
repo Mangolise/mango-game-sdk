@@ -21,6 +21,11 @@ dependencies {
     compileOnly("dev.hollowcube:polar:1.11.1")
 }
 
+java {
+    withSourcesJar()
+}
+
+
 publishing {
     repositories {
         maven {
