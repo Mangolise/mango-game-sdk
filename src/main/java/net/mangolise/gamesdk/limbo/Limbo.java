@@ -12,7 +12,6 @@ import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.instance.IChunkLoader;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import java.util.Objects;
 import java.util.Set;
@@ -51,15 +50,10 @@ public class Limbo {
      * @return a future that completes when all players have joined
      */
     public static CompletableFuture<Set<Player>> waitForPlayers(int playerCount) {
-        CompletableFuture<Set<Player>> future = new CompletableFuture<>();
+        CompletableFuture<Void> future = new CompletableFuture<>();
 
         // funnel all new players to the limbo instance
         GlobalEventHandler eventNode = MinecraftServer.getGlobalEventHandler();
-        EventListener<AsyncPlayerConfigurationEvent> connectListener = EventListener.of(AsyncPlayerConfigurationEvent.class, event -> {
-            // when the player joins the server, we put them into limbo until all players have joined
-            event.setSpawningInstance(Limbo.limbo());
-        });
-        eventNode.addListener(connectListener);
 
         // when the new players join, check if enough players have joined to trigger the future
         AtomicInteger playerCounter = new AtomicInteger(0);
@@ -70,13 +64,35 @@ public class Limbo {
             if (newPlayerCount == playerCount) {
                 // all players have joined, remove our listeners
                 eventNode.removeListener(Objects.requireNonNull(joinEventListener.get(), "Event listener was null"));
-                eventNode.removeListener(connectListener);
-                future.complete(limbo().getPlayers());
+                future.complete(null);
             }
         });
         joinEventListener.set(joinListener);
         eventNode.addListener(joinListener);
 
+        return wait(future);
+    }
+
+    /**
+     * Waits for the given future to complete, then returns the set of players in limbo.
+     * @param cancel the future to wait for.
+     * @return a future that completes with the set of players in limbo once the provided future completes.
+     */
+    public static CompletableFuture<Set<Player>> wait(CompletableFuture<Void> cancel) {
+        CompletableFuture<Set<Player>> future = new CompletableFuture<>();
+
+        // funnel all new players to the limbo instance
+        GlobalEventHandler eventNode = MinecraftServer.getGlobalEventHandler();
+        EventListener<AsyncPlayerConfigurationEvent> connectListener = EventListener.of(AsyncPlayerConfigurationEvent.class, event -> {
+            // when the player joins the server, we put them into limbo until all players have joined
+            event.setSpawningInstance(Limbo.limbo());
+        });
+        eventNode.addListener(connectListener);
+
+        cancel.thenAccept(v -> {
+            eventNode.removeListener(connectListener);
+            future.complete(limbo().getPlayers());
+        });
         return future;
     }
 
