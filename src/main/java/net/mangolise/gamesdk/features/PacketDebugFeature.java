@@ -73,7 +73,7 @@ public class PacketDebugFeature implements Game.Feature<Game> {
             setCondition((sender, s) -> sender instanceof Player);
 
             addSyntax(this::executeNoArgs);
-            addSyntax(this::toggleIgnored, ArgumentType.String("ignored"));
+            addSyntax(this::toggleIgnored, ArgumentType.StringArray("ignored"));
         }
 
         private void executeNoArgs(CommandSender sender, CommandContext context) {
@@ -101,22 +101,25 @@ public class PacketDebugFeature implements Game.Feature<Game> {
         }
 
         private void toggleIgnored(CommandSender sender, CommandContext context) {
-            String name = context.get("ignored");
+            String[] names = context.get("ignored");
             UUID uuid = ((Player)sender).getUuid();
 
-            if (name.equalsIgnoreCase("list")) {
+            if (names[0].equalsIgnoreCase("list")) {
                 sender.sendMessage(Objects.requireNonNullElse(ignored.get(uuid), defaultIgnoredPackets).toString());
                 return;
             }
 
             if (ignored.containsKey(uuid)) {
                 Set<String> ignoredPackets = ignored.get(((Player)sender).getUuid());
-                if (ignoredPackets.contains(name)) {
-                    ignoredPackets.remove(name);
-                    sender.sendMessage("No longer ignoring " + name);
-                } else {
-                    ignoredPackets.add(name);
-                    sender.sendMessage("Ignoring " + name);
+
+                for (String name : names) {
+                    if (ignoredPackets.contains(name)) {
+                        ignoredPackets.remove(name);
+                        sender.sendMessage("No longer ignoring " + name);
+                    } else {
+                        ignoredPackets.add(name);
+                        sender.sendMessage("Ignoring " + name);
+                    }
                 }
             }
             else {
