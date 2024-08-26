@@ -1,5 +1,8 @@
 package net.mangolise.gamesdk;
 
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.Event;
+import net.minestom.server.event.EventNode;
 import net.minestom.server.tag.TagHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public non-sealed abstract class BaseGame<C extends Record> implements Game {
 
     protected TagHandler tagHandler = TagHandler.newHandler();
+    protected final EventNode<Event> eventNode = EventNode.all("game-events");
 
     protected final C config;
     protected BaseGame(C config) {
@@ -22,6 +26,8 @@ public non-sealed abstract class BaseGame<C extends Record> implements Game {
 
     @Override
     public void setup() {
+        MinecraftServer.getGlobalEventHandler().addChild(eventNode);
+
         // setup all the features
         FeatureContext context = new FeatureContext();
 
@@ -38,6 +44,7 @@ public non-sealed abstract class BaseGame<C extends Record> implements Game {
             for (Runnable cleanupTask : cleanupTasks) {
                 cleanupTask.run();
             }
+            MinecraftServer.getGlobalEventHandler().removeChild(eventNode);
         }));
     }
 
@@ -72,5 +79,9 @@ public non-sealed abstract class BaseGame<C extends Record> implements Game {
 
     public @NotNull C config() {
         return config;
+    }
+
+    public @NotNull EventNode<Event> eventNode() {
+        return eventNode;
     }
 }
