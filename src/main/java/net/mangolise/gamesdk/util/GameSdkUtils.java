@@ -4,14 +4,23 @@ import net.hollowcube.polar.PolarLoader;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.collision.BoundingBox;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventListener;
+import net.minestom.server.event.player.PlayerPacketOutEvent;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.instance.block.Block;
+import net.minestom.server.network.packet.server.SendablePacket;
+import net.minestom.server.network.packet.server.play.BlockChangePacket;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 public class GameSdkUtils {
 
@@ -81,5 +90,52 @@ public class GameSdkUtils {
         for (Player player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
             player.sendMessage(message);
         }
+    }
+
+    /**
+     * Gets whether a block collides with a bounding box
+     */
+    public static boolean collidesWithBoundingBox(BoundingBox box, Point position, Point blockPos) {
+        Point boxStart = box.relativeStart().add(position);
+        Point boxEnd = box.relativeEnd().add(position);
+        Point blockEnd = blockPos.add(1, 1, 1);
+
+        return blockEnd.x() > boxStart.x() && blockPos.x() < boxEnd.x() &&
+                blockEnd.y() > boxStart.y() && blockPos.y() < boxEnd.y() &&
+                blockEnd.z() > boxStart.z() && blockPos.z() < boxEnd.z();
+    }
+
+    public static void setBlockCancelPacket(Instance instance, Point pos, Block block) {
+        instance.setBlock(pos, block);
+
+        // stops all packets for this block
+        EventListener<PlayerPacketOutEvent> listener = EventListener.of(PlayerPacketOutEvent.class, e -> {
+            if (e.getPacket() instanceof BlockChangePacket packet &&
+                    packet.blockPosition().distanceSquared(pos) < 1d &&
+                    packet.blockStateId() == block.stateId()) {
+                e.setCancelled(true);
+            }
+        });
+
+        // listens to the packet and stops listening when the next tick starts
+        // (packet is sent at the end of this tick)
+        MinecraftServer.getGlobalEventHandler().addListener(listener);
+        MinecraftServer.getSchedulerManager().scheduleNextTick(() ->
+                MinecraftServer.getGlobalEventHandler().removeListener(listener));
+    }
+
+    /**
+     * use ths function by doing player.eventNode().addListener(cancelOnePacket(...))
+     * or by using MinecraftServer.getGlobalEventManager().addListener(cancelOnePacket(...))
+     */
+    public static EventListener<PlayerPacketOutEvent> cancelOnePacket(Predicate<SendablePacket> predicate) {
+        AtomicBoolean hasFinished = new AtomicBoolean(false);
+
+        return EventListener.builder(PlayerPacketOutEvent.class).handler(e -> {
+            if (predicate.test(e.getPacket())) {
+                hasFinished.set(true);
+                e.setCancelled(true);
+            }
+        }).expireWhen(b -> hasFinished.get()).build();
     }
 }
