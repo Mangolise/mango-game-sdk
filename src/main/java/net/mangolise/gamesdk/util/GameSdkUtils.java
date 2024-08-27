@@ -17,6 +17,7 @@ import net.minestom.server.network.packet.server.play.BlockChangePacket;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -137,5 +138,16 @@ public class GameSdkUtils {
                 e.setCancelled(true);
             }
         }).expireWhen(b -> hasFinished.get()).build();
+    }
+
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#.##");
+    public static String pointToString(Point point) {
+        return decimalFormat.format(point.x()) + " " +
+                decimalFormat.format(point.y()) + " " +
+                decimalFormat.format(point.z());
+    }
+
+    public static String capitaliseFirstLetter(String string) {
+        return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
     }
 }
