@@ -15,10 +15,18 @@ import java.util.function.IntConsumer;
 
 public class Timer {
 
+    /**
+     * Counts down from the given seconds and calls the countDown consumer every second.
+     * @param seconds The amount of seconds to count down from
+     * @param countDown The consumer to call every second
+     * @return A CompletableFuture that completes when the countdown is finished. Complete the future to stop the countdown prematurely.
+     */
     public static CompletableFuture<Void> countDown(long seconds, IntConsumer countDown) {
         CompletableFuture<Void> future = new CompletableFuture<>();
         AtomicInteger counter = new AtomicInteger((int) seconds);
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            if (future.isDone()) return TaskSchedule.stop();
+
             int count = counter.get();
 
             if (count == 0) {
