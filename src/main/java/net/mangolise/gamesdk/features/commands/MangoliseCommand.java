@@ -3,6 +3,7 @@ package net.mangolise.gamesdk.features.commands;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
+import net.minestom.server.command.builder.CommandExecutor;
 import net.minestom.server.command.builder.arguments.Argument;
 import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +12,11 @@ import org.jetbrains.annotations.Nullable;
 public abstract class MangoliseCommand extends Command {
     public MangoliseCommand(@NotNull String name, @Nullable String... aliases) {
         super(name, aliases);
-        setCondition((sender, s) -> !(sender instanceof Player player) || player.hasPermission(getPermission()));
+        setCondition((sender, s) -> !(sender instanceof Player player) || hasPermission(player));
+    }
+
+    public boolean hasPermission(Player player) {
+        return getPermission() == null || player.hasPermission(getPermission());
     }
 
     protected @Nullable Player getAndCheckPlayer(CommandSender sender) {
@@ -21,7 +26,7 @@ public abstract class MangoliseCommand extends Command {
             return null;
         }
 
-        if (!sender.hasPermission(getPermission())) {
+        if (!hasPermission(player)) {
             return null;
         }
 
@@ -35,6 +40,10 @@ public abstract class MangoliseCommand extends Command {
 
             executor.apply(player, context);
         }, args);
+    }
+
+    protected void addCheckedSyntax(CommandExecutor executor, Argument<?>... args) {
+        addConditionalSyntax(getCondition(), executor, args);
     }
 
     protected abstract String getPermission();

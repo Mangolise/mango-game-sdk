@@ -29,10 +29,10 @@ public class TpCommand extends MangoliseCommand {
         addPlayerSyntax(this::executeToEntity, ArgumentType.Entity("to").singleEntity(true));
 
         // /tp Calcilore ~ ~5 ~
-        addSyntax(this::executeFromToPos, ArgumentType.Entity("entity"), ArgumentType.RelativeVec3("to"));
+        addCheckedSyntax(this::executeFromToPos, ArgumentType.Entity("entity"), ArgumentType.RelativeVec3("to"));
 
         // /tp Calcilore CoPokBl
-        addSyntax(this::executeFromToEntity, ArgumentType.Entity("entity"), ArgumentType.Entity("to").singleEntity(true));
+        addCheckedSyntax(this::executeFromToEntity, ArgumentType.Entity("entity"), ArgumentType.Entity("to").singleEntity(true));
     }
 
     private void executeToPos(Player sender, CommandContext context) {
