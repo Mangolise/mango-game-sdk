@@ -1,9 +1,7 @@
 package net.mangolise.gamesdk.features;
 
 import net.mangolise.gamesdk.Game;
-import net.mangolise.gamesdk.features.commands.FlyCommand;
-import net.mangolise.gamesdk.features.commands.GameModeCommand;
-import net.mangolise.gamesdk.features.commands.TpCommand;
+import net.mangolise.gamesdk.features.commands.*;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 
@@ -14,5 +12,7 @@ public class AdminCommandsFeature implements Game.Feature<Game> {
         commands.register(new GameModeCommand());
         commands.register(new FlyCommand());
         commands.register(new TpCommand());
+        commands.register(new PlaySoundCommand());
+        commands.register(new AttributeCommand());
     }
 }
