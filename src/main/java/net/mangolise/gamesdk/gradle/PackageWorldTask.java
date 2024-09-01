@@ -131,7 +131,9 @@ public class PackageWorldTask extends DefaultTask {
                         acceptFileContents.accept(new ByteArrayInputStream(path.getFileName().toString().getBytes()));
                         digestDirectory(path, acceptFileContents);
                     } else {
-                        acceptFileContents.accept(Files.newInputStream(path));
+                        InputStream stream = Files.newInputStream(path);
+                        acceptFileContents.accept(stream);
+                        stream.close();
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
