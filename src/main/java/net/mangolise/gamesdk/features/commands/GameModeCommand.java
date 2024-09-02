@@ -2,10 +2,14 @@ package net.mangolise.gamesdk.features.commands;
 
 import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.GameSdkUtils;
+import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
+import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+
+import java.util.List;
 
 import static net.minestom.server.command.builder.arguments.ArgumentType.Enum;
 
@@ -16,29 +20,29 @@ public class GameModeCommand extends MangoliseCommand {
     }
 
     public GameModeCommand() {
-        super("gamemode", "gm", "gmc", "gms", "gma", "gmsp");
+        super("gamemode");
 
-        addPlayerSyntax(this::executeNoArgs);
-        addPlayerSyntax(this::executeArgs, Enum("gamemode", GameMode.class).setFormat(ArgumentEnum.Format.LOWER_CASED));
+        addPlayerSyntax(this::execute, Enum("gamemode", GameMode.class).setFormat(ArgumentEnum.Format.LOWER_CASED));
+        addCheckedSyntax(this::executeTarget, Enum("gamemode", GameMode.class).setFormat(ArgumentEnum.Format.LOWER_CASED),
+                ArgumentType.Entity("target").onlyPlayers(true));
     }
 
-    private void executeNoArgs(Player sender, CommandContext context) {
-        switch (context.getInput()) {
-            case "gms" -> execute(sender, GameMode.SURVIVAL);
-            case "gma" -> execute(sender, GameMode.ADVENTURE);
-            case "gmc" -> execute(sender, GameMode.CREATIVE);
-            case "gmsp" -> execute(sender, GameMode.SPECTATOR);
-            default -> sender.sendMessage("Invalid gamemode!");
-        }
-    }
-
-    private void executeArgs(Player sender, CommandContext context) {
+    private void execute(Player sender, CommandContext context) {
         GameMode gamemode = context.get("gamemode");
-        execute(sender, gamemode);
-    }
-
-    private void execute(Player sender, GameMode gamemode) {
         sender.setGameMode(gamemode);
         sender.sendMessage(ChatUtil.toComponent("&aGamemode set to &6" + GameSdkUtils.capitaliseFirstLetter(gamemode.toString())));
+    }
+
+    private void executeTarget(CommandSender sender, CommandContext context) {
+        GameMode gamemode = context.get("gamemode");
+        List<Player> players = getPlayers(context, sender, "target");
+        if (players == null) return;
+
+        for (Player player : players) {
+            player.setGameMode(gamemode);
+        }
+
+        sender.sendMessage(ChatUtil.toComponent("&aSet gamemode for &6%s &ato &6%s",
+                context.getRaw("target"), GameSdkUtils.capitaliseFirstLetter(gamemode.toString())));
     }
 }

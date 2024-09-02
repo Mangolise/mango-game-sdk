@@ -1,13 +1,18 @@
 package net.mangolise.gamesdk.features.commands;
 
+import net.mangolise.gamesdk.util.ChatUtil;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.CommandExecutor;
 import net.minestom.server.command.builder.arguments.Argument;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.utils.entity.EntityFinder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class MangoliseCommand extends Command {
     public MangoliseCommand(@NotNull String name, @Nullable String... aliases) {
@@ -17,6 +22,16 @@ public abstract class MangoliseCommand extends Command {
 
     public boolean hasPermission(Player player) {
         return getPermission() == null || player.hasPermission(getPermission());
+    }
+
+    protected List<Player> getPlayers(CommandContext context, CommandSender sender, String argument) {
+        List<Entity> entities = context.<EntityFinder>get(argument).find(sender);
+        if (entities.isEmpty()) {
+            sender.sendMessage(ChatUtil.toComponent("&cCould not find any players..."));
+            return null;
+        }
+
+        return entities.stream().map(entity -> (Player)entity).toList();
     }
 
     protected @Nullable Player getAndCheckPlayer(CommandSender sender) {

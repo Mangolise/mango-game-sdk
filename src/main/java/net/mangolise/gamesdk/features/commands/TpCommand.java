@@ -32,7 +32,7 @@ public class TpCommand extends MangoliseCommand {
         addCheckedSyntax(this::executeFromToPos, ArgumentType.Entity("entity"), ArgumentType.RelativeVec3("to"));
 
         // /tp Calcilore CoPokBl
-        addCheckedSyntax(this::executeFromToEntity, ArgumentType.Entity("entity"), ArgumentType.Entity("to").singleEntity(true));
+        addCheckedSyntax(this::executeFromToEntity, ArgumentType.Entity("entity"), ArgumentType.Entity("toEn").singleEntity(true));
     }
 
     private void executeToPos(Player sender, CommandContext context) {
@@ -45,7 +45,7 @@ public class TpCommand extends MangoliseCommand {
     private void executeToEntity(Player sender, CommandContext context) {
         EntityFinder to = context.get("to");
         execute(sender, sender, to);
-        sendFeedbackRaw(sender, context);
+        sendFeedbackRaw(sender, context, "to");
     }
 
     private void executeFromToPos(CommandSender sender, CommandContext context) {
@@ -67,7 +67,7 @@ public class TpCommand extends MangoliseCommand {
 
     private void executeFromToEntity(CommandSender sender, CommandContext context) {
         EntityFinder finder = context.get("entity");
-        EntityFinder to = context.get("to");
+        EntityFinder to = context.get("toEn");
 
         List<Entity> entities = finder.find(sender);
         if (entities.isEmpty()) {
@@ -79,7 +79,7 @@ public class TpCommand extends MangoliseCommand {
             execute(sender, entity, to);
         }
 
-        sendFeedbackRaw(sender, context);
+        sendFeedbackRaw(sender, context, "toEn");
     }
 
     private void execute(CommandSender sender, Entity entity, RelativeVec position) {
@@ -102,7 +102,7 @@ public class TpCommand extends MangoliseCommand {
         sender.sendMessage(ChatUtil.toComponent("&aTeleported to " + GameSdkUtils.pointToString(pos.fromSender(sender))));
     }
 
-    private void sendFeedbackRaw(CommandSender sender, CommandContext context) {
-        sender.sendMessage(ChatUtil.toComponent("&aTeleported to " + context.getRaw("to")));
+    private void sendFeedbackRaw(CommandSender sender, CommandContext context, String to) {
+        sender.sendMessage(ChatUtil.toComponent("&aTeleported to " + context.getRaw(to)));
     }
 }
