@@ -15,7 +15,9 @@ public class ChatUtil {
      * @param message The message to convert.
      * @return The converted message.
      */
-    public static Component toComponent(String message) {
+    public static Component toComponent(String message, Object... args) {
+        message = String.format(message, args);
+
         Component component = Component.empty();
         StringBuilder currentSection = new StringBuilder();
 
