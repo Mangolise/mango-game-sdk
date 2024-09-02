@@ -3,6 +3,7 @@ package net.mangolise.gamesdk.util;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minestom.server.entity.Player;
 
 public class ChatUtil {
     private static final char COLOR_CHAR = '&';
@@ -73,6 +74,14 @@ public class ChatUtil {
             return component.append(Component.text(currentSection.toString(), color));
         } else {
             return component.append(Component.text(currentSection.toString(), color, decoration));
+        }
+    }
+
+    public static Component getDisplayName(Player player) {
+        if (player.getDisplayName() == null) {
+            return Component.text(player.getUsername(), NamedTextColor.WHITE);
+        } else {
+            return player.getDisplayName();
         }
     }
 }
