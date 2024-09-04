@@ -13,8 +13,7 @@ import net.minestom.server.instance.IChunkLoader;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -65,6 +64,41 @@ public class Limbo {
                 // all players have joined, remove our listeners
                 eventNode.removeListener(Objects.requireNonNull(joinEventListener.get(), "Event listener was null"));
                 future.complete(null);
+            }
+        });
+        joinEventListener.set(joinListener);
+        eventNode.addListener(joinListener);
+
+        return wait(future);
+    }
+
+    public static CompletableFuture<Set<Player>> waitForPlayers(List<UUID> players) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        // funnel all new players to the limbo instance
+        GlobalEventHandler eventNode = MinecraftServer.getGlobalEventHandler();
+
+        List<UUID> remainingPlayers = new ArrayList<>(players);
+        for (Player player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+            remainingPlayers.remove(player.getUuid());
+        }
+
+        if (remainingPlayers.isEmpty()) {
+            future.complete(null);
+            return CompletableFuture.completedFuture(Set.of());
+        }
+
+        // when the new players join, check if enough players have joined to trigger the future
+        AtomicReference<List<UUID>> playersRemaining = new AtomicReference<>(remainingPlayers);
+        AtomicReference<EventListener<Limbo.JoinEvent>> joinEventListener = new AtomicReference<>();
+        var joinListener = EventListener.of(Limbo.JoinEvent.class, event -> {
+            playersRemaining.get().remove(event.getPlayer().getUuid());
+            Log.logger().info("Player removed from waiting list: {}, {} remaining", event.getPlayer().getUsername(), playersRemaining.get().size());
+            if (playersRemaining.get().isEmpty()) {
+                // all players have joined, remove our listeners
+                Log.logger().info("All players have joined, completing limbo future");
+                future.complete(null);
+                eventNode.removeListener(Objects.requireNonNull(joinEventListener.get(), "Event listener was null"));
             }
         });
         joinEventListener.set(joinListener);
