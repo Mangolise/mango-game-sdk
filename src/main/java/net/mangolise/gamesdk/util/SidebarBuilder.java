@@ -34,7 +34,7 @@ public class SidebarBuilder {
         sidebar.getLines().forEach(line -> sidebar.removeLine(line.getId()));
 
         for (int i = 0; i < lines.size(); i++) {
-            sidebar.createLine(new Sidebar.ScoreboardLine(String.valueOf(i), lines.get(i), lines.size() - i - 1));
+            sidebar.createLine(new Sidebar.ScoreboardLine(String.valueOf(i), lines.get(i), lines.size() - i - 1, Sidebar.NumberFormat.blank()));
         }
     }
 }
