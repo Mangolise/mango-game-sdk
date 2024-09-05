@@ -128,10 +128,10 @@ public class GameSdkUtils {
     }
 
     /**
-     * use ths function by doing player.eventNode().addListener(singleUseEvent(...))
-     * or by using MinecraftServer.getGlobalEventManager().addListener(singleUseEvent(...))
+     * use ths function by doing player.eventNode().addListener(cancelOnePacket(...))
+     * or by using MinecraftServer.getGlobalEventManager().addListener(cancelOnePacket(...))
      */
-    public static EventListener<PlayerPacketOutEvent> singleUseEvent(Predicate<SendablePacket> predicate) {
+    public static EventListener<PlayerPacketOutEvent> cancelOnePacket(Predicate<SendablePacket> predicate) {
         AtomicBoolean hasFinished = new AtomicBoolean(false);
 
         return EventListener.builder(PlayerPacketOutEvent.class).handler(e -> {
@@ -143,10 +143,10 @@ public class GameSdkUtils {
     }
 
     /**
-     * use ths function by doing player.eventNode().addListener(singleUsePacket(...))
-     * or by using MinecraftServer.getGlobalEventManager().addListener(singleUsePacket(...))
+     * use ths function by doing player.eventNode().addListener(singleUseEvent(...))
+     * or by using MinecraftServer.getGlobalEventManager().addListener(singleUseEvent(...))
      */
-    public static <T extends Event> EventListener<T> singleUsePacket(Class<T> clazz, Consumer<T> handler) {
+    public static <T extends Event> EventListener<T> singleUseEvent(Class<T> clazz, Consumer<T> handler) {
         AtomicBoolean hasFinished = new AtomicBoolean(false);
 
         return EventListener.builder(clazz).handler(e -> {
