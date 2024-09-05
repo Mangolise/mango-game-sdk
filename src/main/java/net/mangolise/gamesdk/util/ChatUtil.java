@@ -86,4 +86,32 @@ public class ChatUtil {
             return player.getDisplayName();
         }
     }
+
+    /**
+     * Converts a millisecond time to a human-readable timer
+     *
+     * @param time the time in milliseconds
+     * @return the formatted time
+     */
+    public static String formatTime(long time) {
+        return formatTime(time, true);
+    }
+
+    /**
+     * Converts a millisecond time to a human-readable timer
+     *
+     * @param time the time in milliseconds
+     * @param exact whether to round to the nearest tick (0.05 seconds)
+     * @return the formatted time
+     */
+    public static String formatTime(long time, boolean exact) {
+        long millis = (exact ? (time / 10) : (time / 50 * 5)) % 100;
+
+        // if milliseconds
+        if (time > 60*60*1000) {
+            return String.format("%02d:%02d:%02d.%02d", time / 3600000, time / 60000 % 60, time / 1000 % 60, millis);
+        }
+
+        return String.format("%02d:%02d.%02d", time / 60000, time / 1000 % 60, millis);
+    }
 }
