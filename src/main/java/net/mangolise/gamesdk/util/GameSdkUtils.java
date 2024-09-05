@@ -8,6 +8,7 @@ import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.Event;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.player.PlayerPacketOutEvent;
 import net.minestom.server.instance.Instance;
@@ -21,6 +22,7 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class GameSdkUtils {
@@ -137,6 +139,19 @@ public class GameSdkUtils {
                 hasFinished.set(true);
                 e.setCancelled(true);
             }
+        }).expireWhen(b -> hasFinished.get()).build();
+    }
+
+    /**
+     * use ths function by doing player.eventNode().addListener(singleUsePacket(...))
+     * or by using MinecraftServer.getGlobalEventManager().addListener(singleUsePacket(...))
+     */
+    public static <T extends Event> EventListener<T> singleUsePacket(Class<T> clazz, Consumer<T> handler) {
+        AtomicBoolean hasFinished = new AtomicBoolean(false);
+
+        return EventListener.builder(clazz).handler(e -> {
+            handler.accept(e);
+            hasFinished.set(true);
         }).expireWhen(b -> hasFinished.get()).build();
     }
 
