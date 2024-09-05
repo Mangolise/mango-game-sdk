@@ -53,10 +53,12 @@ public class Timer {
     }
 
     public static CompletableFuture<Void> countDownForPlayer(int fromCount, Audience player) {
-        return countDown(fromCount, 20, count -> {
+        CompletableFuture<Void> timer = countDown(fromCount, 20, count -> {
             Component component = Component.text(count).color(NamedTextColor.RED);
             Title.Times times = Title.Times.times(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofMillis(100));
             player.showTitle(Title.title(Component.text(""), component, times));
-        }).thenAccept(ignored -> player.clearTitle());
+        });
+        timer.thenAccept(ignored -> player.clearTitle());
+        return timer;
     }
 }
