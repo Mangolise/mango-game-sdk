@@ -22,7 +22,6 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class GameSdkUtils {
@@ -146,12 +145,11 @@ public class GameSdkUtils {
      * use ths function by doing player.eventNode().addListener(singleUseEvent(...))
      * or by using MinecraftServer.getGlobalEventManager().addListener(singleUseEvent(...))
      */
-    public static <T extends Event> EventListener<T> singleUseEvent(Class<T> clazz, Consumer<T> handler) {
+    public static <T extends Event> EventListener<T> singleUseEvent(Class<T> clazz, Predicate<T> handler) {
         AtomicBoolean hasFinished = new AtomicBoolean(false);
 
         return EventListener.builder(clazz).handler(e -> {
-            handler.accept(e);
-            hasFinished.set(true);
+            hasFinished.set(handler.test(e));
         }).expireWhen(b -> hasFinished.get()).build();
     }
 
