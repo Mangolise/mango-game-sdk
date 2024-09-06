@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class ChatUtil {
     private static final char COLOR_CHAR = '&';
@@ -69,6 +70,28 @@ public class ChatUtil {
         }
 
         return component;
+    }
+
+    public static @Nullable NamedTextColor codeToNamedTextColor(String code) {
+        code = code.replace("§", "").replace("&", "");
+        return switch (code) {
+            case "0" -> NamedTextColor.BLACK;
+            case "1" -> NamedTextColor.DARK_BLUE;
+            case "2" -> NamedTextColor.DARK_GREEN;
+            case "3" -> NamedTextColor.DARK_AQUA;
+            case "4" -> NamedTextColor.DARK_RED;
+            case "5" -> NamedTextColor.DARK_PURPLE;
+            case "6" -> NamedTextColor.GOLD;
+            case "7" -> NamedTextColor.GRAY;
+            case "8" -> NamedTextColor.DARK_GRAY;
+            case "9" -> NamedTextColor.BLUE;
+            case "a" -> NamedTextColor.GREEN;
+            case "b" -> NamedTextColor.AQUA;
+            case "c" -> NamedTextColor.RED;
+            case "d" -> NamedTextColor.LIGHT_PURPLE;
+            case "e" -> NamedTextColor.YELLOW;
+            default -> null;
+        };
     }
 
     private static Component applyComponent(Component component, StringBuilder currentSection, NamedTextColor color, TextDecoration decoration) {
