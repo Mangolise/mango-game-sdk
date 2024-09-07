@@ -21,6 +21,9 @@ dependencies {
 
     // gradle task
     compileOnly(gradleApi())
+
+    // tests
+    testImplementation("net.minestom:minestom-snapshots:6c5cd6544e")
 }
 
 java {
