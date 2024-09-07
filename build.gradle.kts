@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     compileOnly("net.minestom:minestom-snapshots:6c5cd6544e")
-    implementation("ch.qos.logback:logback-classic:1.5.7")
+    api("ch.qos.logback:logback-classic:1.5.7")
     api("net.kyori:adventure-text-minimessage:4.17.0")
     api("dev.hollowcube:polar:1.11.1")
 
