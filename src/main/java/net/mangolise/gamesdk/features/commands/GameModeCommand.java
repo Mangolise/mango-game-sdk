@@ -1,7 +1,6 @@
 package net.mangolise.gamesdk.features.commands;
 
 import net.mangolise.gamesdk.util.ChatUtil;
-import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
@@ -30,7 +29,7 @@ public class GameModeCommand extends MangoliseCommand {
     private void execute(Player sender, CommandContext context) {
         GameMode gamemode = context.get("gamemode");
         sender.setGameMode(gamemode);
-        sender.sendMessage(ChatUtil.toComponent("&aGamemode set to &6" + GameSdkUtils.capitaliseFirstLetter(gamemode.toString())));
+        sender.sendMessage(ChatUtil.toComponent("&aGamemode set to &6" + ChatUtil.capitaliseFirstLetter(gamemode.toString())));
     }
 
     private void executeTarget(CommandSender sender, CommandContext context) {
@@ -43,6 +42,6 @@ public class GameModeCommand extends MangoliseCommand {
         }
 
         sender.sendMessage(ChatUtil.toComponent("&aSet gamemode for &6%s &ato &6%s",
-                context.getRaw("target"), GameSdkUtils.capitaliseFirstLetter(gamemode.toString())));
+                context.getRaw("target"), ChatUtil.capitaliseFirstLetter(gamemode.toString())));
     }
 }

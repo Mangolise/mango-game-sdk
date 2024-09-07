@@ -137,4 +137,38 @@ public class ChatUtil {
 
         return String.format("%02d:%02d.%02d", time / 60000, time / 1000 % 60, millis);
     }
+
+    /**
+     * Converts a snake_case string to a Title Case string
+     * @param snakeCase The snake_case string
+     * @return The Title Case string
+     */
+    public static String snakeCaseToTitleCase(String snakeCase) {
+        if (snakeCase.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder cString = new StringBuilder(snakeCase.toLowerCase());
+        if (cString.charAt(0) != '_') {
+            cString.setCharAt(0, Character.toUpperCase(cString.charAt(0)));
+        }
+
+        int cIndex = cString.indexOf("_");
+        while (cIndex != -1) {
+            cString.setCharAt(cIndex, ' ');
+            cString.setCharAt(cIndex + 1, Character.toUpperCase(cString.charAt(cIndex + 1)));
+            cIndex = cString.indexOf("_");
+        }
+        return cString.toString();
+    }
+
+    /**
+     * Capitalises the first letter of a string
+     *
+     * @param string The string to capitalise the first letter of
+     * @return The string with the first letter capitalised
+     */
+    public static String capitaliseFirstLetter(String string) {
+        return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
+    }
 }

@@ -13,6 +13,10 @@ repositories {
     mavenCentral()
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 dependencies {
     compileOnly("net.minestom:minestom-snapshots:6c5cd6544e")
     api("ch.qos.logback:logback-classic:1.5.7")
@@ -24,6 +28,8 @@ dependencies {
 
     // tests
     testImplementation("net.minestom:minestom-snapshots:6c5cd6544e")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
 
 java {

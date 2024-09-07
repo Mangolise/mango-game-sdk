@@ -160,6 +160,14 @@ public class GameSdkUtils {
                 decimalFormat.format(point.z());
     }
 
+    /**
+     * Capitalises the first letter of a string
+     *
+     * @deprecated Use {@link ChatUtil#capitaliseFirstLetter(String)} instead
+     * @param string The string to capitalise the first letter of
+     * @return The string with the first letter capitalised
+     */
+    @Deprecated(forRemoval = true)
     public static String capitaliseFirstLetter(String string) {
         return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
     }
