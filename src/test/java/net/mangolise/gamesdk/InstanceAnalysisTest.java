@@ -5,12 +5,15 @@ import net.mangolise.gamesdk.instance.InstanceAnalysis;
 import net.mangolise.gamesdk.log.Log;
 import net.mangolise.gamesdk.log.MangoliseLogbackLayout;
 import net.minestom.server.MinecraftServer;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 
-public class Test {
-    public static void main(String[] args) throws IOException {
+public class InstanceAnalysisTest {
+
+    @Test
+    public void time() throws IOException {
         MangoliseLogbackLayout.init();
         MinecraftServer.init();
 

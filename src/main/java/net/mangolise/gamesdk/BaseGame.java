@@ -72,6 +72,20 @@ public non-sealed abstract class BaseGame<C extends Record> implements Game {
         }
     }
 
+    /**
+     * Gets this game's instance of the specified feature.
+     * @param clazz The feature class
+     * @return The feature instance
+     * @param <T> The feature type
+     */
+    public <T> T feature(Class<T> clazz) {
+        return features().stream()
+                .filter(clazz::isInstance)
+                .map(clazz::cast)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Feature " + clazz + " not found"));
+    }
+
     @Override
     public @NotNull TagHandler tagHandler() {
         return tagHandler;
