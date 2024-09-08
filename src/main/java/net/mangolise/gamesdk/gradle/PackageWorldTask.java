@@ -107,7 +107,12 @@ public class PackageWorldTask extends DefaultTask {
             MessageDigest md5 = MessageDigest.getInstance("md5");
             digestDirectory(dir, stream -> {
                 try {
-                    md5.update(stream.readAllBytes());
+                    // update in increments to avoid loading the entire file into memory
+                    byte[] buffer = new byte[1024];
+                    int read;
+                    while ((read = stream.read(buffer)) != -1) {
+                        md5.update(buffer, 0, read);
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
