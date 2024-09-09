@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import net.hollowcube.polar.AnvilPolar;
 import net.hollowcube.polar.PolarWorld;
 import net.hollowcube.polar.PolarWriter;
+import net.mangolise.gamesdk.packaging.EntityPackaging;
 import net.minestom.server.MinecraftServer;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
@@ -81,6 +82,11 @@ public class PackageWorldTask extends DefaultTask {
 
                 long startMs = System.currentTimeMillis();
                 PolarWorld polarWorld = AnvilPolar.anvilToPolar(world);
+
+                // read entities
+                byte[] entities = EntityPackaging.unpackAnvil(world);
+                polarWorld.userData(entities);
+
                 byte[] polarWorldBytes = PolarWriter.write(polarWorld);
                 Files.createDirectories(worldPath.getParent());
                 Files.deleteIfExists(worldPath);
