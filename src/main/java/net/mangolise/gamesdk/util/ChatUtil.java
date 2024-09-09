@@ -77,12 +77,17 @@ public class ChatUtil {
     public static String formatTime(long time, boolean exact) {
         long millis = (exact ? (time / 10) : (time / 50 * 5)) % 100;
 
-        // if milliseconds
-        if (time > 60*60*1000) {
+        // if time needs hours
+        if (time >= 60*60*1000) {
             return String.format("%02d:%02d:%02d.%02d", time / 3600000, time / 60000 % 60, time / 1000 % 60, millis);
         }
 
-        return String.format("%02d:%02d.%02d", time / 60000, time / 1000 % 60, millis);
+        // if time needs minutes
+        if (time >= 60*1000) {
+            return String.format("%02d:%02d.%02d", time / 60000, time / 1000 % 60, millis);
+        }
+
+        return String.format("%02d.%02d", time / 1000, millis);
     }
 
     /**
