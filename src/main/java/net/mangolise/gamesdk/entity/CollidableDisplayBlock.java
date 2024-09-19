@@ -1,6 +1,7 @@
 package net.mangolise.gamesdk.entity;
 
 import net.minestom.server.collision.BoundingBox;
+import net.minestom.server.collision.Shape;
 import net.minestom.server.collision.ShapeImpl;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
@@ -16,14 +17,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class CollidableDisplayBlock extends Entity {
     private final List<ShulkerCollision> shulkers;
+    private Block block;
+    private Collection<BoundingBox> collision;
+    private int interpolation;
 
-    public CollidableDisplayBlock(Instance instance, Block block, Point position, int interpolation) {
+    public CollidableDisplayBlock(Instance instance, Block block, Point position, int interpolation, @Nullable Collection<BoundingBox> customCollision) {
         super(EntityType.BLOCK_DISPLAY);
+        this.block = block;
+        this.interpolation = interpolation;
 
         // Create the visible block
         editEntityMeta(BlockDisplayMeta.class, meta -> {
@@ -34,12 +42,26 @@ public class CollidableDisplayBlock extends Entity {
         });
 
         setInstance(instance, position);
+        instance.loadOptionalChunk(position);
 
-        // Create the collision
-        List<BoundingBox> collisionShapes = ((ShapeImpl) block.registry().collisionShape()).collisionBoundingBoxes();
         shulkers = new ArrayList<>();
+        createShulkerCollision(customCollision);
+    }
 
-        for (BoundingBox shape : collisionShapes) {
+    private void createShulkerCollision(@Nullable Collection<BoundingBox> customCollision) {
+        // Create the collision
+        if (customCollision == null) {
+            Shape shape = block.registry().collisionShape();
+            switch (shape) {
+                case BoundingBox box -> this.collision = Collections.singletonList(box);
+                case ShapeImpl impl -> this.collision = impl.collisionBoundingBoxes();
+                default -> throw new IllegalStateException(shape.getClass().getSimpleName() + " is a supported block collision shape");
+            }
+        } else {
+            this.collision = customCollision;
+        }
+
+        for (BoundingBox shape : this.collision) {
             double size = Math.min(shape.width(), Math.min(shape.height(), shape.depth()));
             for (double x = shape.minX(); x < shape.maxX(); x += size) {
                 for (double y = shape.minY(); y < shape.maxY(); y += size) {
@@ -54,9 +76,11 @@ public class CollidableDisplayBlock extends Entity {
             }
         }
 
-        // create hitbox after move is finished
+        // place shulkers in world on top of display block entities so that they don't snap to blocks
         for (ShulkerCollision shulker : shulkers) {
             Point spawnPos = position.add(shulker.offset);
+            instance.loadOptionalChunk(spawnPos);
+
             shulker.vehicle.setInstance(instance, spawnPos);
             shulker.shulker.setInstance(instance, spawnPos);
             shulker.vehicle.addPassenger(shulker.shulker);
@@ -89,7 +113,13 @@ public class CollidableDisplayBlock extends Entity {
         return super.teleport(position, chunks, flags, shouldConfirm);
     }
 
+    public int getInterpolation() {
+        return interpolation;
+    }
+
     private void setInterpolation(int interpolation) {
+        this.interpolation = interpolation;
+
         editEntityMeta(BlockDisplayMeta.class, meta -> {
             meta.setTransformationInterpolationDuration(interpolation);
             meta.setPosRotInterpolationDuration(interpolation);
@@ -101,6 +131,27 @@ public class CollidableDisplayBlock extends Entity {
                 meta.setPosRotInterpolationDuration(interpolation);
             });
         }
+    }
+
+    public Collection<BoundingBox> getCollision() {
+        return collision;
+    }
+
+    public Block getBlock() {
+        return block;
+    }
+
+    public void setBlock(Block block, @Nullable Collection<BoundingBox> customCollision) {
+        this.block = block;
+        this.collision = customCollision;
+
+        for (ShulkerCollision shulker : shulkers) {
+            shulker.shulker.remove();
+            shulker.vehicle.remove();
+        }
+
+        shulkers.clear();
+        createShulkerCollision(customCollision);
     }
 
     private record ShulkerCollision(LivingEntity shulker, Entity vehicle, Point offset) { }
