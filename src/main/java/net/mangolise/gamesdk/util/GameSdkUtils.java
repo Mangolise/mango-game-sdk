@@ -3,6 +3,8 @@ package net.mangolise.gamesdk.util;
 import net.hollowcube.polar.PolarLoader;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import net.mangolise.gamesdk.events.CooldownEvent;
+import net.mangolise.gamesdk.events.StopCooldownEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
@@ -13,6 +15,7 @@ import net.minestom.server.event.EventListener;
 import net.minestom.server.event.player.PlayerPacketOutEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.network.packet.server.play.BlockChangePacket;
 
@@ -170,5 +173,15 @@ public class GameSdkUtils {
     @Deprecated(forRemoval = true)
     public static String capitaliseFirstLetter(String string) {
         return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
+    }
+
+    public static void startCooldown(Player player, String name, Material icon, long timeMs) {
+        CooldownEvent event = new CooldownEvent(name, timeMs, icon, player);
+        MinecraftServer.getGlobalEventHandler().call(event);
+    }
+
+    public static void stopCooldown(Player player, String name) {
+        StopCooldownEvent event = new StopCooldownEvent(player, name);
+        MinecraftServer.getGlobalEventHandler().call(event);
     }
 }
