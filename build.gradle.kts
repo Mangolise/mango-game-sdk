@@ -27,7 +27,7 @@ dependencies {
     compileOnly(gradleApi())
 
     // tests
-    testImplementation("net.minestom:minestom-snapshots:6c5cd6544e")
+    testImplementation("net.minestom:minestom-snapshots:d0754f2a15")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
