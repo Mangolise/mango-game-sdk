@@ -77,10 +77,21 @@ public class InventoryMenu {
     /**
      * Creates a menu item and adds it to the first available slot
      * @param icon the icon of the item in the inventory
+     * @param name the name of the item
      * @return the menu item, which does nothing by default
      */
-    public MenuItem addMenuItem(Material icon) {
-        return addMenuItem(ItemStack.of(icon));
+    public MenuItem addMenuItem(Material icon, Component name) {
+        return addMenuItem(ItemStack.of(icon).withCustomName(name));
+    }
+
+    /**
+     * Creates a menu item and adds it to the first available slot
+     * @param icon the icon of the item in the inventory
+     * @param name the name of the item
+     * @return the menu item, which does nothing by default
+     */
+    public MenuItem addMenuItem(Material icon, String name) {
+        return addMenuItem(ItemStack.of(icon).withCustomName(Component.text(name)));
     }
 
     /**
@@ -102,11 +113,25 @@ public class InventoryMenu {
      * If the slot is taken by another menu item, then it will be overwritten
      * @param slot the slot to add the item to
      * @param icon the icon of the item in the inventory
+     * @param name the name of the item
      * @return the menu item, which does nothing by default
      */
-    public MenuItem setMenuItem(int slot, Material icon) {
-        return setMenuItem(slot, ItemStack.of(icon));
+    public MenuItem setMenuItem(int slot, Material icon, Component name) {
+        return setMenuItem(slot, ItemStack.of(icon).withCustomName(name));
     }
+
+    /**
+     * Creates a menu item and adds it to a specified slot.
+     * If the slot is taken by another menu item, then it will be overwritten
+     * @param slot the slot to add the item to
+     * @param icon the icon of the item in the inventory
+     * @param name the name of the item
+     * @return the menu item, which does nothing by default
+     */
+    public MenuItem setMenuItem(int slot, Material icon, String name) {
+        return setMenuItem(slot, ItemStack.of(icon).withCustomName(Component.text(name)));
+    }
+
 
     public void stop() {
         MinecraftServer.getGlobalEventHandler().removeListener(clickListener);
@@ -170,7 +195,7 @@ public class InventoryMenu {
 
     private void onClick(InventoryPreClickEvent e) {
         // only continue if the player has this inventory menu open
-        Inventory inventory = e.getPlayer().getOpenInventory();
+        Inventory inventory = e.getInventory();
         if (inventory == null || !inventoryUuid.equals(inventory.getTag(MENU_UUID_TAG))) {
             return;
         }
