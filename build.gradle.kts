@@ -17,6 +17,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
+// use unicode
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
 dependencies {
     compileOnly("net.minestom:minestom-snapshots:d0754f2a15")
     api("ch.qos.logback:logback-classic:1.5.7")
