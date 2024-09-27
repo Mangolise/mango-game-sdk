@@ -34,7 +34,7 @@ public class PackageWorldTask extends DefaultTask {
     public void packageWorld() {
         MinecraftServer.init();
 
-        Path rootDir = getProject().getRootDir().toPath();
+        Path rootDir = getProject().getProjectDir().toPath();
         Path worldsDir = rootDir.resolve("worlds");
         Path worldsCache = rootDir.resolve("build").resolve(".worldscache.json");
 

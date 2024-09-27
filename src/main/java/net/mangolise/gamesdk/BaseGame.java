@@ -23,21 +23,22 @@ public non-sealed abstract class BaseGame<C extends Record> implements Game {
     }
 
     protected final List<Runnable> cleanupTasks = new CopyOnWriteArrayList<>();
+    private FeatureContext featureContext;
 
     @Override
     public void setup() {
         MinecraftServer.getGlobalEventHandler().addChild(eventNode);
 
         // setup all the features
-        FeatureContext context = new FeatureContext();
+        featureContext = new FeatureContext();
 
         for (Feature<?> feature : features()) {
             //noinspection unchecked
-            feature.setup(context);
-            context.loadedFeatures.put(feature.getClass(), feature);
+            feature.setup(featureContext);
+            featureContext.loadedFeatures.put(feature.getClass(), feature);
         }
 
-        cleanupTasks.addAll(context.cleanupTasks);
+        cleanupTasks.addAll(featureContext.cleanupTasks);
 
         // register the cleanup tasks
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -79,11 +80,7 @@ public non-sealed abstract class BaseGame<C extends Record> implements Game {
      * @param <T> The feature type
      */
     public <T> T feature(Class<T> clazz) {
-        return features().stream()
-                .filter(clazz::isInstance)
-                .map(clazz::cast)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Feature " + clazz + " not found"));
+        return clazz.cast(featureContext.loadedFeatures.get(clazz));
     }
 
     @Override

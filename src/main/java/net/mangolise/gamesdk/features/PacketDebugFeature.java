@@ -55,13 +55,13 @@ public class PacketDebugFeature implements Game.Feature<Game> {
                 return;
             }
 
-            p.sendMessage("\n" + serverPacket);
+            p.sendMessage("\nOUT: " + serverPacket);
         } else {
             if (ignoredPackets.contains(clientPacket.getClass().getSimpleName())) {
                 return;
             }
 
-            p.sendMessage("\n" + clientPacket);
+            p.sendMessage("\nIN : " + clientPacket);
         }
     }
 

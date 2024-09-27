@@ -1,6 +1,7 @@
 package net.mangolise.gamesdk.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.scoreboard.Sidebar;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class SidebarBuilder {
     }
 
     public SidebarBuilder addLine(String line) {
-        lines.add(Component.text(line));
+        lines.add(Component.text(line).color(NamedTextColor.WHITE));
         return this;
     }
 
