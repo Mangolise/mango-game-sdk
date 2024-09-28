@@ -21,5 +21,6 @@ public class AdminCommandsFeature implements Game.Feature<Game> {
         commands.register(new PlaySoundCommand());
         commands.register(new AttributeCommand());
         commands.register(new TpsCommand());
+        commands.register(new SetBlockCommand());
     }
 }
