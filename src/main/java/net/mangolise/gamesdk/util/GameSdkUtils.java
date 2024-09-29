@@ -9,6 +9,8 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventListener;
@@ -18,6 +20,7 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.network.packet.server.play.BlockChangePacket;
+import net.minestom.server.world.DimensionType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,10 +59,12 @@ public class GameSdkUtils {
      * @return the y coordinate of the highest block.
      */
     public static int getHighestBlock(Instance instance, int x, int z) {
-        int y = 255;
-        while (instance.getBlock(x, y, z).isAir()) {
-            y--;
-        }
+        DimensionType dimensionType = instance.getCachedDimensionType();
+        int y = dimensionType.maxY() - 1;
+        int minY = dimensionType.minY();
+
+        for (; instance.getBlock(x, y, z).isAir() && y > minY; y--) { }
+
         return y;
     }
 
@@ -183,5 +188,11 @@ public class GameSdkUtils {
     public static void stopCooldown(Player player, String name) {
         StopCooldownEvent event = new StopCooldownEvent(player, name);
         MinecraftServer.getGlobalEventHandler().call(event);
+    }
+
+    public static void strikeLightning(Instance instance, Pos pos) {
+        Entity bolt = new Entity(EntityType.LIGHTNING_BOLT);
+        bolt.setInstance(instance, pos);
+        MinecraftServer.getSchedulerManager().scheduleNextTick(bolt::remove);
     }
 }
