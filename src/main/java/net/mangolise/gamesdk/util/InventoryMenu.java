@@ -3,7 +3,6 @@ package net.mangolise.gamesdk.util;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.EventListener;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.player.PlayerPacketEvent;
 import net.minestom.server.inventory.Inventory;
@@ -15,31 +14,28 @@ import net.minestom.server.network.packet.client.play.ClientClickWindowPacket;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class InventoryMenu {
     private static final Tag<UUID> MENU_UUID_TAG = Tag.UUID("gamesdk_menu_uuid");
+    private static final Map<Inventory, InventoryMenu> inventoryMap = Collections.synchronizedMap(new WeakHashMap<>());
 
     private final UUID inventoryUuid;
     private final Inventory inventory;
     private final Map<UUID, MenuItem> menuItems;
-    private final EventListener<InventoryPreClickEvent> clickListener;
-    private final EventListener<PlayerPacketEvent> packetListener;
+
+    static {
+        MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, InventoryMenu::onClick);
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerPacketEvent.class, InventoryMenu::onPacket);
+    }
 
     public InventoryMenu(Inventory inventory) {
         menuItems = new HashMap<>();
         this.inventory = inventory;
         this.inventoryUuid = UUID.randomUUID();
-        inventory.setTag(MENU_UUID_TAG, inventoryUuid);
-
-        clickListener = EventListener.of(InventoryPreClickEvent.class, this::onClick);
-        packetListener = EventListener.of(PlayerPacketEvent.class, this::onPacket);
-        MinecraftServer.getGlobalEventHandler().addListener(clickListener);
-        MinecraftServer.getGlobalEventHandler().addListener(packetListener);
+        inventoryMap.put(inventory, this);
     }
 
     public InventoryMenu(InventoryType type, String title) {
@@ -132,20 +128,22 @@ public class InventoryMenu {
         return setMenuItem(slot, ItemStack.of(icon).withCustomName(Component.text(name)));
     }
 
+    private static void onPacket(PlayerPacketEvent e) {
+        if (!(e.getPacket() instanceof ClientClickWindowPacket packet)) {
+            return;
+        }
 
-    public void stop() {
-        MinecraftServer.getGlobalEventHandler().removeListener(clickListener);
-        MinecraftServer.getGlobalEventHandler().removeListener(packetListener);
-    }
+        Inventory inventory = e.getPlayer().getOpenInventory();
 
-    private void onPacket(PlayerPacketEvent e) {
-        if (!(e.getPacket() instanceof ClientClickWindowPacket packet) ||
+        if (inventory == null || !inventoryMap.containsKey(inventory) ||
                 packet.windowId() != inventory.getWindowId() ||
                 packet.slot() < 0 || packet.slot() >= inventory.getSize()) {
             return;
         }
 
-        MenuItem item = menuItems.get(inventory.getItemStack(packet.slot()).getTag(MENU_UUID_TAG));
+        InventoryMenu menu = inventoryMap.get(inventory);
+
+        MenuItem item = menu.menuItems.get(inventory.getItemStack(packet.slot()).getTag(MENU_UUID_TAG));
         if (item == null) {
             return;
         }
@@ -155,7 +153,7 @@ public class InventoryMenu {
             // Shift click
 
             if (packet.button() == 0) { // Shift Left click
-                MenuItemClickEvent event = new MenuItemClickEvent(this, player, item, MenuClickType.SHIFT_LEFT, -1);
+                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, item, MenuClickType.SHIFT_LEFT, -1);
 
                 if (item.onShiftLeftClick != null) {
                     item.onShiftLeftClick.accept(event);
@@ -164,7 +162,7 @@ public class InventoryMenu {
                 }
             }
             else { // Shift Right click
-                MenuItemClickEvent event = new MenuItemClickEvent(this, player, item, MenuClickType.SHIFT_RIGHT, -1);
+                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, item, MenuClickType.SHIFT_RIGHT, -1);
 
                 if (item.onShiftRightClick != null) {
                     item.onShiftRightClick.accept(event);
@@ -181,24 +179,26 @@ public class InventoryMenu {
 
             if (packet.button() == 40) { // If it is swap with offhand
                 if (item.onSwapClick != null) {
-                    item.onSwapClick.accept(new MenuItemClickEvent(this, player, item, MenuClickType.SWAP, -1));
+                    item.onSwapClick.accept(new MenuItemClickEvent(menu, player, item, MenuClickType.SWAP, -1));
                 }
                 return;
             }
 
             if (item.onHotbarClick != null) {
                 // clamp the slot to within 0-8 so that the player cant send packets with a modified client that causes bugs
-                item.onHotbarClick.accept(new MenuItemClickEvent(this, player, item, MenuClickType.HOTBAR, Math.clamp(packet.button(), 0, 8)));
+                item.onHotbarClick.accept(new MenuItemClickEvent(menu, player, item, MenuClickType.HOTBAR, Math.clamp(packet.button(), 0, 8)));
             }
         }
     }
 
-    private void onClick(InventoryPreClickEvent e) {
+    private static void onClick(InventoryPreClickEvent e) {
         // only continue if the player has this inventory menu open
         Inventory inventory = e.getInventory();
-        if (inventory == null || !inventoryUuid.equals(inventory.getTag(MENU_UUID_TAG))) {
+        if (inventory == null || !inventoryMap.containsKey(inventory)) {
             return;
         }
+
+        InventoryMenu menu = inventoryMap.get(inventory);
 
         e.setCancelled(true);
 
@@ -208,7 +208,7 @@ public class InventoryMenu {
             return;
         }
 
-        MenuItem menuItem = menuItems.get(uuid);
+        MenuItem menuItem = menu.menuItems.get(uuid);
         if (menuItem == null) {
             // this should not happen, unless the player manually adds a different menu item to this inventory
             return;
@@ -222,21 +222,21 @@ public class InventoryMenu {
         switch (clickType) {
             case LEFT_CLICK -> {
                 if (menuItem.onLeftClick != null) {
-                    menuItem.onLeftClick.accept(new MenuItemClickEvent(this, player, menuItem, MenuClickType.LEFT, -1));
+                    menuItem.onLeftClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.LEFT, -1));
                 }
             }
 
             case RIGHT_CLICK -> {
                 if (menuItem.onRightClick != null) {
-                    menuItem.onRightClick.accept(new MenuItemClickEvent(this, player, menuItem, MenuClickType.RIGHT, -1));
+                    menuItem.onRightClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.RIGHT, -1));
                 } else if (menuItem.onLeftClick != null) {
-                    menuItem.onLeftClick.accept(new MenuItemClickEvent(this, player, menuItem, MenuClickType.RIGHT, -1));
+                    menuItem.onLeftClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.RIGHT, -1));
                 }
             }
 
             case DROP -> {
                 if (menuItem.onDropClick != null) {
-                    menuItem.onDropClick.accept(new MenuItemClickEvent(this, player, menuItem, MenuClickType.DROP, -1));
+                    menuItem.onDropClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.DROP, -1));
                 }
             }
 
