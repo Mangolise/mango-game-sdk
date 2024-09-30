@@ -17,7 +17,7 @@ import java.util.Collection;
 public class AttributeCommand extends MangoliseCommand {
     @Override
     protected String getPermission() {
-        return "";
+        return "mangolise.command.attribute";
     }
 
     public AttributeCommand() {

@@ -16,7 +16,7 @@ import java.util.List;
 public class TpCommand extends MangoliseCommand {
     @Override
     protected String getPermission() {
-        return "mangolise.command.fly";
+        return "mangolise.command.teleport";
     }
 
     public TpCommand() {

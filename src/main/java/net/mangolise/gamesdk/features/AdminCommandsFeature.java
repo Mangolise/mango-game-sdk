@@ -15,12 +15,13 @@ public class AdminCommandsFeature implements Game.Feature<Game> {
         commands.register(new ShortGameModeCommand("gms", GameMode.SURVIVAL));
         commands.register(new ShortGameModeCommand("gma", GameMode.ADVENTURE));
         commands.register(new ShortGameModeCommand("gmsp", GameMode.SPECTATOR));
-
         commands.register(new FlyCommand());
         commands.register(new TpCommand());
         commands.register(new PlaySoundCommand());
         commands.register(new AttributeCommand());
         commands.register(new TpsCommand());
         commands.register(new SetBlockCommand());
+        commands.register(new HealCommand());
+        commands.register(new FillCommand());
     }
 }
