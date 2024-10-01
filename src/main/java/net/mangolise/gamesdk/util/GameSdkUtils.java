@@ -9,14 +9,17 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.metadata.item.ItemEntityMeta;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.player.PlayerPacketOutEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.network.packet.server.play.BlockChangePacket;
@@ -27,6 +30,7 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
@@ -194,5 +198,15 @@ public class GameSdkUtils {
         Entity bolt = new Entity(EntityType.LIGHTNING_BOLT);
         bolt.setInstance(instance, pos);
         MinecraftServer.getSchedulerManager().scheduleNextTick(bolt::remove);
+    }
+
+    public static Entity dropItemNaturally(Instance world, Point pos, ItemStack stack) {
+        Entity item = new Entity(EntityType.ITEM);
+        item.editEntityMeta(ItemEntityMeta.class, e -> e.setItem(stack));
+        item.setInstance(world, new Pos(pos));
+        double x = ThreadLocalRandom.current().nextDouble();
+        double z = ThreadLocalRandom.current().nextDouble();
+        item.setVelocity(new Vec(x, 2, z).mul(2));
+        return item;
     }
 }
