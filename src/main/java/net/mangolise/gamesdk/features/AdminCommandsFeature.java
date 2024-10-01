@@ -23,5 +23,6 @@ public class AdminCommandsFeature implements Game.Feature<Game> {
         commands.register(new SetBlockCommand());
         commands.register(new HealCommand());
         commands.register(new FillCommand());
+        commands.register(new PacketDebugCommand());
     }
 }

@@ -12,8 +12,8 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.entity.Player;
-import net.minestom.server.entity.metadata.item.ItemEntityMeta;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.player.PlayerPacketOutEvent;
@@ -200,10 +200,15 @@ public class GameSdkUtils {
         MinecraftServer.getSchedulerManager().scheduleNextTick(bolt::remove);
     }
 
-    public static Entity dropItemNaturally(Instance world, Point pos, ItemStack stack) {
-        Entity item = new Entity(EntityType.ITEM);
-        item.editEntityMeta(ItemEntityMeta.class, e -> e.setItem(stack));
+    public static ItemEntity dropItem(Instance world, Point pos, ItemStack stack) {
+        ItemEntity item = new ItemEntity(stack);
+        item.setPickupDelay(Duration.ofMillis(500));
         item.setInstance(world, new Pos(pos));
+        return item;
+    }
+
+    public static ItemEntity dropItemNaturally(Instance world, Point pos, ItemStack stack) {
+        ItemEntity item = dropItem(world, pos, stack);
         double x = ThreadLocalRandom.current().nextDouble();
         double z = ThreadLocalRandom.current().nextDouble();
         item.setVelocity(new Vec(x, 2, z).mul(2));
