@@ -6,15 +6,20 @@ import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.CommandExecutor;
 import net.minestom.server.command.builder.arguments.Argument;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.utils.entity.EntityFinder;
+import net.minestom.server.utils.location.RelativeVec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public abstract class MangoliseCommand extends Command {
+    protected static final EntityFinder SELF_ENTITY_FINDER = new EntityFinder().setTargetSelector(EntityFinder.TargetSelector.SELF);
+    protected static final RelativeVec CURRENT_POS_RELATIVEVEC = new RelativeVec(Vec.ZERO, RelativeVec.CoordinateType.RELATIVE, true, true, true);
+
     public MangoliseCommand(@NotNull String name, @Nullable String... aliases) {
         super(name, aliases);
         setCondition((sender, s) -> !(sender instanceof Player player) || hasPermission(player));

@@ -17,7 +17,7 @@ public class SetBlockCommand extends MangoliseCommand {
         super("setblock");
 
         addPlayerSyntax(this::execute, ArgumentType.BlockState("block"), ArgumentType.RelativeVec3("pos")
-                .setDefaultValue(new RelativeVec(Vec.ZERO, RelativeVec.CoordinateType.RELATIVE, true, true, true)));
+                .setDefaultValue(CURRENT_POS_RELATIVEVEC));
     }
 
     private void execute(Player player, CommandContext context) {
