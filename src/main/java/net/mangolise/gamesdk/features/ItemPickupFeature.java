@@ -18,6 +18,11 @@ public class ItemPickupFeature implements Game.Feature<Game> {
             return;
         }
 
+        if (player.isDead()) {
+            event.setCancelled(true);
+            return;
+        }
+
         ItemStack newStack = player.getInventory().addItemStack(event.getItemStack(), TransactionOption.ALL);
 
         if (!newStack.isAir()) {
