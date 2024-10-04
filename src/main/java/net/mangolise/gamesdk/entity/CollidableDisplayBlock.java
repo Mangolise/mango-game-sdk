@@ -26,6 +26,8 @@ public class CollidableDisplayBlock extends Entity {
     private static final BoundingBox PLAYER_BOUNDING_BOX = new BoundingBox(0.6, 1.8, 0.6, new Vec(-0.3, 0.0, -0.3));
 
     private final List<ShulkerCollision> shulkers;
+    private Point firstOffset;
+    private LivingEntity firstShulker;
     private Block block;
     private Collection<BoundingBox> collision;
     private int interpolation;
@@ -53,14 +55,11 @@ public class CollidableDisplayBlock extends Entity {
             meta.setScale(this.scale);
         });
 
-        setInstance(instance, position);
-        instance.loadOptionalChunk(position);
-
         shulkers = new ArrayList<>();
-        createShulkerCollision(customCollision);
+        createShulkerCollision(customCollision, instance, position);
     }
 
-    private void createShulkerCollision(@Nullable Collection<BoundingBox> customCollision) {
+    private void createShulkerCollision(@Nullable Collection<BoundingBox> customCollision, Instance instance, Point position) {
         // Create the collision
         if (customCollision == null) {
             Shape shape = block.registry().collisionShape();
@@ -71,6 +70,11 @@ public class CollidableDisplayBlock extends Entity {
             }
         } else {
             this.collision = customCollision;
+        }
+
+        if (this.collision.isEmpty()) {
+            this.editEntityMeta(BlockDisplayMeta.class, meta -> meta.setTranslation(Vec.ZERO));
+            return;
         }
 
         for (BoundingBox shape : this.collision) {
@@ -130,14 +134,28 @@ public class CollidableDisplayBlock extends Entity {
             }
         }
 
+        // Optimisation: first shulker can ride the shulker for displaying the block and we can use a transform offset
+        // to display it at the correct position
+        {
+            ShulkerCollision shulker = shulkers.removeFirst();
+            shulker.vehicle.remove();
+            firstShulker = shulker.shulker;
+            firstOffset = shulker.offset;
+
+            Point spawnPos = position.add(shulker.offset);//.add(0.5, 0.0, 0.5);
+
+            // setInstance runs teleport if the block is already in this instance
+            setInstance(instance, spawnPos).thenAccept(ignored -> this.addPassenger(shulker.shulker));
+
+            this.editEntityMeta(BlockDisplayMeta.class, meta -> meta.setTranslation(shulker.offset.mul(-1)));
+        }
+
         // place shulkers in world on top of display block entities so that they don't snap to blocks
         for (ShulkerCollision shulker : shulkers) {
             Point spawnPos = position.add(shulker.offset);
-            instance.loadOptionalChunk(spawnPos);
 
-            shulker.vehicle.setInstance(instance, spawnPos);
-            shulker.shulker.setInstance(instance, spawnPos);
-            shulker.vehicle.addPassenger(shulker.shulker);
+            shulker.vehicle.setInstance(instance, spawnPos).thenAccept(ignored ->
+                    shulker.vehicle.addPassenger(shulker.shulker));
         }
     }
 
@@ -164,7 +182,7 @@ public class CollidableDisplayBlock extends Entity {
             shulker.vehicle.teleport(position.add(shulker.offset), chunks, flags, shouldConfirm);
         }
 
-        return super.teleport(position, chunks, flags, shouldConfirm);
+        return super.teleport(position.add(firstOffset), chunks, flags, shouldConfirm);
     }
 
     public int getInterpolation() {
@@ -214,8 +232,10 @@ public class CollidableDisplayBlock extends Entity {
             shulker.vehicle.remove();
         }
 
+        firstShulker.remove();
+
         shulkers.clear();
-        createShulkerCollision(customCollision);
+        createShulkerCollision(customCollision, instance, position);
     }
 
     private record ShulkerCollision(LivingEntity shulker, Entity vehicle, Point offset) { }
