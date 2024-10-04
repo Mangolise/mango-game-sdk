@@ -83,6 +83,10 @@ public non-sealed abstract class BaseGame<C extends Record> implements Game {
         return clazz.cast(featureContext.loadedFeatures.get(clazz));
     }
 
+    public boolean hasFeature(Class<?> clazz) {
+        return feature(clazz) != null;
+    }
+
     @Override
     public @NotNull TagHandler tagHandler() {
         return tagHandler;
