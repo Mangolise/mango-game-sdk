@@ -17,8 +17,15 @@ public class ChatUtil {
      * @return The converted message.
      */
     public static Component toComponent(String message, Object... args) {
-        message = String.format(message, args);
+        return toComponent(String.format(message, args));
+    }
 
+    /**
+     * Converts a legacy & color code string to a modern Adventure Component.
+     * @param message The message to convert.
+     * @return The converted message.
+     */
+    public static Component toComponent(String message) {
         Component component = Component.empty();
         StringBuilder currentSection = new StringBuilder();
 
