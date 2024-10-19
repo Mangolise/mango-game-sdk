@@ -74,6 +74,8 @@ public class CollidableDisplayBlock extends Entity {
 
         if (this.collision.isEmpty()) {
             this.editEntityMeta(BlockDisplayMeta.class, meta -> meta.setTranslation(Vec.ZERO));
+            setInstance(instance, position);
+            firstOffset = Vec.ZERO;
             return;
         }
 
@@ -142,7 +144,7 @@ public class CollidableDisplayBlock extends Entity {
             firstShulker = shulker.shulker;
             firstOffset = shulker.offset;
 
-            Point spawnPos = position.add(shulker.offset);//.add(0.5, 0.0, 0.5);
+            Point spawnPos = position.add(shulker.offset);
 
             // setInstance runs teleport if the block is already in this instance
             setInstance(instance, spawnPos).thenAccept(ignored -> this.addPassenger(shulker.shulker));
@@ -183,6 +185,10 @@ public class CollidableDisplayBlock extends Entity {
         }
 
         return super.teleport(position.add(firstOffset), chunks, flags, shouldConfirm);
+    }
+
+    public Pos getWantedPosition() {
+        return getPosition().sub(firstOffset);
     }
 
     public int getInterpolation() {
