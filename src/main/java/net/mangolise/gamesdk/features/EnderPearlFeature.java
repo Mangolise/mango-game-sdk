@@ -2,6 +2,7 @@ package net.mangolise.gamesdk.features;
 
 import net.mangolise.gamesdk.Game;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityProjectile;
@@ -10,6 +11,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,8 +48,23 @@ public class EnderPearlFeature implements Game.Feature<Game> {
                 pearlLand(collideEvent.getEntity(), player));
     }
 
+    private boolean isFullBlock(Block block) {
+        if (!block.isSolid()) {
+            return false;
+        }
+        Point start = block.registry().collisionShape().relativeStart();
+        Point end = block.registry().collisionShape().relativeEnd();
+        return Math.abs(end.x() - start.x()) == 1 && Math.abs(end.y() - start.y()) == 1 && Math.abs(end.z() - start.z()) == 1;
+    }
+
+    private boolean isValidDestination(Block block) {
+        if (block.isAir()) return true;
+        if (!isFullBlock(block)) return true;
+        return false;
+    }
+
     private Pos getSafeTpPos(Entity pearl) {
-        Pos actual = pearl.getPosition().sub(pearl.getPosition().direction());
+        Pos actual = pearl.getPosition().sub(pearl.getPosition().direction().mul(2));
         if (pearl.getInstance().getBlock(actual).isAir()) {
             return actual;
         }
@@ -65,7 +82,7 @@ public class EnderPearlFeature implements Game.Feature<Game> {
         );
 
         for (Pos pos : alternatives) {
-            if (pearl.getInstance().getBlock(pos).isAir()) {
+            if (isValidDestination(pearl.getInstance().getBlock(pos))) {
                 return pos;
             }
         }
