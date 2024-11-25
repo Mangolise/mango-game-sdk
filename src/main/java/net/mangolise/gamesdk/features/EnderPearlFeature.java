@@ -4,10 +4,7 @@ import net.mangolise.gamesdk.Game;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityProjectile;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.Player;
+import net.minestom.server.entity.*;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
@@ -96,7 +93,8 @@ public class EnderPearlFeature implements Game.Feature<Game> {
             return;
         }
 
-        thrower.teleport(getSafeTpPos(pearl));
+        Pos pos = getSafeTpPos(pearl).withView(0, 0);
+        thrower.teleport(pos, null, RelativeFlags.VIEW);
         pearl.remove();
     }
 }
