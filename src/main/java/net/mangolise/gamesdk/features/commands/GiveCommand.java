@@ -5,6 +5,7 @@ import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.inventory.TransactionOption;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.entity.EntityFinder;
 
@@ -30,7 +31,7 @@ public class GiveCommand extends MangoliseCommand {
 
         for (Entity entity : targets) {
             if (entity instanceof Player target) {
-                target.getInventory().addItemStack(item);
+                target.getInventory().addItemStack(item, TransactionOption.ALL);
             }
         }
 
