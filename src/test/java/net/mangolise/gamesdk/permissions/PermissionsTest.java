@@ -1,6 +1,5 @@
-package net.mangolise.gamesdk;
+package net.mangolise.gamesdk.permissions;
 
-import net.mangolise.gamesdk.permissions.Permissions;
 import net.mangolise.gamesdk.permissions.backends.MapPermissionsBackend;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
@@ -14,7 +13,6 @@ public class PermissionsTest {
     @Test
     public void testPermissions() {
         Permissions.setBackend(new MapPermissionsBackend());
-
         MinecraftServer.init();
 
         // Connection is null for unit test
@@ -30,5 +28,35 @@ public class PermissionsTest {
         Assertions.assertFalse(Permissions.hasPermission(player, "lovespotatoes.mashed"));
         Assertions.assertFalse(Permissions.hasPermission(player, "lovespotatoes.fromcountry.france"));
         Assertions.assertFalse(Permissions.hasPermission(player, "lovespotatoes.fromcountry.frHELLOWORLDnce"));
+    }
+
+    @Test
+    public void callbacks() {
+        Permissions.setBackend(new MapPermissionsBackend());
+        MinecraftServer.init();
+
+        // Connection is null for unit test
+        @SuppressWarnings("DataFlowIssue") Player player = new Player(UUID.randomUUID(), "PotatoMan", null);
+        boolean[] callbackCalled = {false};
+
+        // Setting exact to true
+        Permissions.registerCallback(player, "me.lovespotatoes", (p, node) -> callbackCalled[0] = true);
+        Permissions.setPermission(player, "me.lovespotatoes", true);
+        Assertions.assertTrue(callbackCalled[0]);
+
+        // Setting exact to false
+        callbackCalled[0] = false;
+        Permissions.removePermission(player, "me.lovespotatoes");
+        Assertions.assertTrue(callbackCalled[0]);
+
+        // Setting wildcard to true
+        callbackCalled[0] = false;
+        Permissions.setPermission(player, "me.*", true);
+        Assertions.assertTrue(callbackCalled[0]);
+
+        // Canceling wildcard callback
+        callbackCalled[0] = false;
+        Permissions.registerCallback(player, "tomato.potato", (p, node) -> callbackCalled[0] = true).run();
+        Permissions.setPermission(player, "tomato.*", true);
     }
 }

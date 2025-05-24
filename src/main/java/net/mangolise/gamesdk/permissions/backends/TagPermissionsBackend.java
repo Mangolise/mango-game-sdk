@@ -24,9 +24,13 @@ public class TagPermissionsBackend extends NodeStoragePermissionsBackend {
             vals.put(permission, val);
             return vals;
         });
+
+        callbacks.runPermissionChangeCallback(player, permission);
     }
 
     public void removePermission(Player player, String permission) {
         player.getTag(PERMISSIONS).remove(permission);
+
+        callbacks.runPermissionChangeCallback(player, permission);
     }
 }
