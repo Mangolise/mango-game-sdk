@@ -1,5 +1,6 @@
 package net.mangolise.gamesdk.features.commands;
 
+import net.mangolise.gamesdk.permissions.Permissions;
 import net.mangolise.gamesdk.util.ChatUtil;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
@@ -26,7 +27,7 @@ public abstract class MangoliseCommand extends Command {
     }
 
     public boolean hasPermission(Player player) {
-        return getPermission() == null || player.hasPermission(getPermission());
+        return getPermission() == null || Permissions.hasPermission(player, getPermission());
     }
 
     protected List<Player> getPlayers(CommandContext context, CommandSender sender, String argument) {
