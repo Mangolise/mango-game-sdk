@@ -6,6 +6,12 @@ import net.minestom.server.tag.Tag;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The default and recommended permissions backend for general use.
+ * This backend uses Minestom's tag system to store permissions.
+ * Keep in mind that permissions are stored per player and will not persist
+ * across server restarts or player disconnects.
+ */
 public class TagPermissionsBackend extends NodeStoragePermissionsBackend {
     public static Tag<Map<String, Boolean>> PERMISSIONS = Tag.<Map<String, Boolean>>Transient("gamesdk_permissions").defaultValue(HashMap::new);
 

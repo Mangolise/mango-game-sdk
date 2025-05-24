@@ -58,5 +58,32 @@ public class PermissionsTest {
         callbackCalled[0] = false;
         Permissions.registerCallback(player, "tomato.potato", (p, node) -> callbackCalled[0] = true).run();
         Permissions.setPermission(player, "tomato.*", true);
+        Assertions.assertFalse(callbackCalled[0]);
+
+        // Callback for any node
+        Permissions.registerCallback(player, null, (p, node) -> callbackCalled[0] = true);
+        Permissions.setPermission(player, "any.node", true);
+        Assertions.assertTrue(callbackCalled[0]);
+
+        @SuppressWarnings("DataFlowIssue") Player player2 = new Player(UUID.randomUUID(), "PotatoMan2", null);
+
+        // Callback for any player and a specific node
+        callbackCalled[0] = false;
+        Permissions.registerCallback(null, "any.node", (p, node) -> callbackCalled[0] = true);
+
+        // p1
+        Permissions.setPermission(player2, "any.node", true);
+        Assertions.assertTrue(callbackCalled[0]);
+
+        // p2
+        callbackCalled[0] = false;
+        Permissions.setPermission(player, "any.node", true);
+        Assertions.assertTrue(callbackCalled[0]);
+
+        // Callback for any player and any node
+        callbackCalled[0] = false;
+        Permissions.registerCallback(null, null, (p, node) -> callbackCalled[0] = true);
+        Permissions.setPermission(player2, "some.thing", true);
+        Assertions.assertTrue(callbackCalled[0]);
     }
 }

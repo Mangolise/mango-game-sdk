@@ -7,6 +7,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * A simple in-memory permissions backend that stores permissions in a map.
+ * This is useful for unit tests or NON-PRODUCTION environments.
+ * <p>
+ * This backend should not be used in production as {@link TagPermissionsBackend} can do the same thing
+ * but without memory leaks associated with players not being removed from our map.
+ * <p>
+ * USE AT YOUR OWN RISK.
+ */
 @ApiStatus.Internal
 public class MapPermissionsBackend extends NodeStoragePermissionsBackend {
     public static Map<UUID, Map<String, Boolean>> permissions = new HashMap<>();
