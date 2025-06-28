@@ -64,10 +64,10 @@ public abstract class NodeStoragePermissionsBackend implements PermissionsBacken
     @Override
     public boolean hasPermission(Player player, String node) {
         boolean matchesPos = false;
-        Pattern regex = Pattern.compile("^(" + node.replace("*", ".*") + ")$");
 
         for (Map.Entry<String, Boolean> perm : getNodes(player).entrySet()) {
-            boolean matches = regex.matcher(perm.getKey()).matches();
+            Pattern regex = Pattern.compile("^(" + perm.getKey().replace("*", ".*") + ")$");
+            boolean matches = regex.matcher(node).matches();
             if (!matches) continue;
 
             if (perm.getValue()) {

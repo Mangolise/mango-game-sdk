@@ -19,15 +19,20 @@ public class PermissionsTest {
         @SuppressWarnings("DataFlowIssue") Player player = new Player(UUID.randomUUID(), "PotatoMan", null);
         Permissions.setPermission(player, "lovespotatoes", true);
         Permissions.setPermission(player, "lovespotatoes.baked", true);
+        Permissions.setPermission(player, "adam.is.*", true);
         Permissions.setPermission(player, "lovespotatoes.fromcountry.*", true);
         Permissions.setPermission(player, "lovespotatoes.fromcountry.france", false);
         Permissions.setPermission(player, "lovespotatoes.fromcountry.fr*nce", false);
 
         Assertions.assertTrue(Permissions.hasPermission(player, "lovespotatoes"));
         Assertions.assertTrue(Permissions.hasPermission(player, "lovespotatoes.baked"));
+        Assertions.assertTrue(Permissions.hasPermission(player, "adam.is.mad"));
         Assertions.assertFalse(Permissions.hasPermission(player, "lovespotatoes.mashed"));
         Assertions.assertFalse(Permissions.hasPermission(player, "lovespotatoes.fromcountry.france"));
         Assertions.assertFalse(Permissions.hasPermission(player, "lovespotatoes.fromcountry.frHELLOWORLDnce"));
+
+        Permissions.setPermission(player, "*", true);
+        Assertions.assertTrue(Permissions.hasPermission(player, "michael.exists"));
     }
 
     @Test
