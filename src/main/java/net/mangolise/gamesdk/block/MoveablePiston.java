@@ -9,7 +9,7 @@ import net.minestom.server.network.packet.server.ServerPacket;
 import net.minestom.server.network.packet.server.play.BlockActionPacket;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.TaskSchedule;
-import net.minestom.server.utils.PacketUtils;
+import net.minestom.server.utils.PacketSendingUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -73,7 +73,7 @@ public class MoveablePiston {
         }
 
         ServerPacket packet = new BlockActionPacket(pos, (byte)0, actionParam, Block.STICKY_PISTON);
-        PacketUtils.sendGroupedPacket(chunk.getViewers(), packet);
+        PacketSendingUtils.sendGroupedPacket(chunk.getViewers(), packet);
 
         instance.playSound(Sound.sound(SoundEvent.BLOCK_PISTON_EXTEND, Sound.Source.BLOCK, 0.5f,
                 ThreadLocalRandom.current().nextFloat(0.6f, 0.85f)), pos);
@@ -100,7 +100,7 @@ public class MoveablePiston {
         }
 
         ServerPacket packet = new BlockActionPacket(pos, (byte)1, actionParam, Block.STICKY_PISTON);
-        PacketUtils.sendGroupedPacket(chunk.getViewers(), packet);
+        PacketSendingUtils.sendGroupedPacket(chunk.getViewers(), packet);
 
         instance.playSound(Sound.sound(SoundEvent.BLOCK_PISTON_CONTRACT, Sound.Source.BLOCK, 0.5f,
                 ThreadLocalRandom.current().nextFloat(0.6f, 0.8f)), pos);

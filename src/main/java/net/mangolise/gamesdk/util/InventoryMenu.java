@@ -5,8 +5,10 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.player.PlayerPacketEvent;
+import net.minestom.server.inventory.AbstractInventory;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
+import net.minestom.server.inventory.click.Click;
 import net.minestom.server.inventory.click.ClickType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -20,7 +22,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class InventoryMenu {
     private static final Tag<UUID> MENU_UUID_TAG = Tag.UUID("gamesdk_menu_uuid");
-    private static final Map<Inventory, InventoryMenu> inventoryMap = Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Map<AbstractInventory, InventoryMenu> inventoryMap = Collections.synchronizedMap(new WeakHashMap<>());
 
     private final UUID inventoryUuid;
     private final Inventory inventory;
@@ -133,7 +135,7 @@ public class InventoryMenu {
             return;
         }
 
-        Inventory inventory = e.getPlayer().getOpenInventory();
+        AbstractInventory inventory = e.getPlayer().getOpenInventory();
 
         if (inventory == null || !inventoryMap.containsKey(inventory) ||
                 packet.windowId() != inventory.getWindowId() ||
@@ -193,8 +195,8 @@ public class InventoryMenu {
 
     private static void onClick(InventoryPreClickEvent e) {
         // only continue if the player has this inventory menu open
-        Inventory inventory = e.getInventory();
-        if (inventory == null || !inventoryMap.containsKey(inventory)) {
+        AbstractInventory inventory = e.getInventory();
+        if (!inventoryMap.containsKey(inventory)) {
             return;
         }
 
@@ -214,19 +216,19 @@ public class InventoryMenu {
             return;
         }
 
-        ClickType clickType = e.getClickType();
+        Click clickType = e.getClick();
         Player player = e.getPlayer();
 
         // not all cases are handled here, some just are not possible with a vanilla client in this situation
         // and others have to be handled in the packet because this event doesn't give all the information needed
         switch (clickType) {
-            case LEFT_CLICK -> {
+            case Click.Left ignored -> {
                 if (menuItem.onLeftClick != null) {
                     menuItem.onLeftClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.LEFT, -1));
                 }
             }
 
-            case RIGHT_CLICK -> {
+            case Click.Right ignored -> {
                 if (menuItem.onRightClick != null) {
                     menuItem.onRightClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.RIGHT, -1));
                 } else if (menuItem.onLeftClick != null) {
@@ -234,18 +236,18 @@ public class InventoryMenu {
                 }
             }
 
-            case DROP -> {
+            case Click.DropSlot ignored -> {
                 if (menuItem.onDropClick != null) {
                     menuItem.onDropClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.DROP, -1));
                 }
             }
 
-            case START_SHIFT_CLICK -> {
+            case Click.LeftShift ignored -> {
                 // This is handled in packet listener because there is no way to identify if it was a right click
                 // or a left click that did the shift click
             }
 
-            case CHANGE_HELD -> {
+            case Click.HotbarSwap ignored -> {
                 // This is handled in packet listener because there is no way to identify which slot was swapped with
             }
 

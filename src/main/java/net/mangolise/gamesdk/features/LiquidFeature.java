@@ -1,5 +1,6 @@
 package net.mangolise.gamesdk.features;
 
+import net.kyori.adventure.key.Key;
 import net.mangolise.gamesdk.Game;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.BlockVec;
@@ -7,7 +8,6 @@ import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.block.BlockHandler;
-import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -26,7 +26,7 @@ public class LiquidFeature implements Game.Feature<Game> {
     }
 
     private static void createHandler(Block liquid, int flowSpeed, boolean canInfinite) {
-        MinecraftServer.getBlockManager().registerHandler(liquid.namespace(),
+        MinecraftServer.getBlockManager().registerHandler(liquid.key(),
                 () -> new LiquidSourceHandler(liquid, flowSpeed, canInfinite));
     }
 
@@ -59,8 +59,8 @@ public class LiquidFeature implements Game.Feature<Game> {
         }
 
         @Override
-        public @NotNull NamespaceID getNamespaceId() {
-            return block.namespace();
+        public @NotNull Key getKey() {
+            return block.key();
         }
 
         @Override
