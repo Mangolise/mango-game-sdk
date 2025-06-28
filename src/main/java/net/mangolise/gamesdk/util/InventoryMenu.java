@@ -9,7 +9,6 @@ import net.minestom.server.inventory.AbstractInventory;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.click.Click;
-import net.minestom.server.inventory.click.ClickType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.client.play.ClientClickWindowPacket;
@@ -151,31 +150,7 @@ public class InventoryMenu {
         }
 
         Player player = e.getPlayer();
-        if (packet.clickType() == ClientClickWindowPacket.ClickType.QUICK_MOVE) {
-            // Shift click
-
-            if (packet.button() == 0) { // Shift Left click
-                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, item, MenuClickType.SHIFT_LEFT, -1);
-
-                if (item.onShiftLeftClick != null) {
-                    item.onShiftLeftClick.accept(event);
-                } else if (item.onLeftClick != null) {
-                    item.onLeftClick.accept(event);
-                }
-            }
-            else { // Shift Right click
-                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, item, MenuClickType.SHIFT_RIGHT, -1);
-
-                if (item.onShiftRightClick != null) {
-                    item.onShiftRightClick.accept(event);
-                } else if (item.onRightClick != null) {
-                    item.onRightClick.accept(event);
-                } else if (item.onLeftClick != null) {
-                    item.onLeftClick.accept(event);
-                }
-            }
-        }
-        else if (packet.clickType() == ClientClickWindowPacket.ClickType.SWAP) {
+        if (packet.clickType() == ClientClickWindowPacket.ClickType.SWAP) {
             // Either hotbar number button or swap with offhand button
             // packet.button() is which hotbar slot it is swapped with
 
@@ -243,8 +218,25 @@ public class InventoryMenu {
             }
 
             case Click.LeftShift ignored -> {
-                // This is handled in packet listener because there is no way to identify if it was a right click
-                // or a left click that did the shift click
+                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, menuItem, MenuClickType.SHIFT_LEFT, -1);
+
+                if (menuItem.onShiftLeftClick != null) {
+                    menuItem.onShiftLeftClick.accept(event);
+                } else if (menuItem.onLeftClick != null) {
+                    menuItem.onLeftClick.accept(event);
+                }
+            }
+
+            case Click.RightShift ignored -> {
+                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, menuItem, MenuClickType.SHIFT_RIGHT, -1);
+
+                if (menuItem.onShiftRightClick != null) {
+                    menuItem.onShiftRightClick.accept(event);
+                } else if (menuItem.onRightClick != null) {
+                    menuItem.onRightClick.accept(event);
+                } else if (menuItem.onLeftClick != null) {
+                    menuItem.onLeftClick.accept(event);
+                }
             }
 
             case Click.HotbarSwap ignored -> {
