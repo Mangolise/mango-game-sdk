@@ -1,5 +1,6 @@
 package net.mangolise.gamesdk.features.commands;
 
+import net.kyori.adventure.key.Key;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
@@ -8,7 +9,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.entity.attribute.AttributeModifier;
 import net.minestom.server.entity.attribute.AttributeOperation;
-import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.utils.entity.EntityFinder;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,8 +102,8 @@ public class AttributeCommand extends MangoliseCommand {
         return target;
     }
 
-    private NamespaceID getId(CommandContext context) {
-        return NamespaceID.from(context.<String>get("id"));
+    private Key getId(CommandContext context) {
+        return Key.key(context.<String>get("id"));
     }
 
     private String modifierToString(AttributeModifier modifier) {
@@ -141,7 +141,7 @@ public class AttributeCommand extends MangoliseCommand {
     private void executeModifierGet(CommandSender sender, CommandContext context) {
         Player target = findPlayer(sender, context);
         Attribute attribute = findAttribute(sender, context);
-        NamespaceID id = getId(context);
+        Key id = getId(context);
         if (attribute == null || target == null) return;
 
         AttributeModifier modifier = target.getAttribute(attribute).modifiers().stream()
@@ -178,7 +178,7 @@ public class AttributeCommand extends MangoliseCommand {
     private void executeModifierRemove(CommandSender sender, CommandContext context) {
         Player target = findPlayer(sender, context);
         Attribute attribute = findAttribute(sender, context);
-        NamespaceID id = getId(context);
+        Key id = getId(context);
         if (attribute == null || target == null) return;
 
         AttributeModifier modifier = target.getAttribute(attribute).removeModifier(id);

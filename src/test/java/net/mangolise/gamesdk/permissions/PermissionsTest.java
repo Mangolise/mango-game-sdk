@@ -3,6 +3,7 @@ package net.mangolise.gamesdk.permissions;
 import net.mangolise.gamesdk.permissions.backends.MapPermissionsBackend;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
+import net.minestom.server.network.player.GameProfile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ public class PermissionsTest {
         MinecraftServer.init();
 
         // Connection is null for unit test
-        @SuppressWarnings("DataFlowIssue") Player player = new Player(UUID.randomUUID(), "PotatoMan", null);
+        @SuppressWarnings("DataFlowIssue") Player player = new Player(null, new GameProfile(UUID.randomUUID(), "PotatoMan"));
         Permissions.setPermission(player, "lovespotatoes", true);
         Permissions.setPermission(player, "lovespotatoes.baked", true);
         Permissions.setPermission(player, "adam.is.*", true);
@@ -41,7 +42,7 @@ public class PermissionsTest {
         MinecraftServer.init();
 
         // Connection is null for unit test
-        @SuppressWarnings("DataFlowIssue") Player player = new Player(UUID.randomUUID(), "PotatoMan", null);
+        @SuppressWarnings("DataFlowIssue") Player player = new Player(null, new GameProfile(UUID.randomUUID(), "PotatoMan"));
         boolean[] callbackCalled = {false};
 
         // Setting exact to true
@@ -70,7 +71,7 @@ public class PermissionsTest {
         Permissions.setPermission(player, "any.node", true);
         Assertions.assertTrue(callbackCalled[0]);
 
-        @SuppressWarnings("DataFlowIssue") Player player2 = new Player(UUID.randomUUID(), "PotatoMan2", null);
+        @SuppressWarnings("DataFlowIssue") Player player2 = new Player(null, new GameProfile(UUID.randomUUID(), "PotatoMan2"));
 
         // Callback for any player and a specific node
         callbackCalled[0] = false;

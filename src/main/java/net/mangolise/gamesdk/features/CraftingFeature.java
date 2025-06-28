@@ -12,6 +12,7 @@ import net.minestom.server.inventory.AbstractInventory;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
+import net.minestom.server.inventory.click.Click;
 import net.minestom.server.inventory.click.ClickType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -49,7 +50,7 @@ public class CraftingFeature implements Game.Feature<Game> {
             return;
         }
 
-        if (event.getPlayer().getOpenInventory().getInventoryType() == InventoryType.CRAFTING) {
+        if (event.getPlayer().getOpenInventory() instanceof Inventory inventory && inventory.getInventoryType() == InventoryType.CRAFTING) {
             craftingInvClick(event);
             return;
         }
@@ -149,7 +150,7 @@ public class CraftingFeature implements Game.Feature<Game> {
         // otherwise it will be the crafting grid inventory. The player's open inventory will always be the crafting grid
         // at this point because we checked it in the event handler
         AbstractInventory inventory = event.getInventory() == null ? event.getPlayer().getInventory() : event.getInventory();
-        Inventory craftingInv = event.getPlayer().getOpenInventory();
+        AbstractInventory craftingInv = event.getPlayer().getOpenInventory();
         assert craftingInv != null;  // We checked it in the method that calls this
 
         List<Material> slots = getCInvSlots(craftingInv);
@@ -195,9 +196,9 @@ public class CraftingFeature implements Game.Feature<Game> {
 
     private void invPreClick(@NotNull InventoryPreClickEvent event) {
         int resultSlot = event.getInventory() == null ? PINV_RESULT_SLOT : CINV_RESULT_SLOT;
-        if (event.getClickType() != ClickType.SHIFT_CLICK &&
-                event.getClickType() != ClickType.START_SHIFT_CLICK &&
-                (!event.getCursorItem().isAir() && event.getSlot() == resultSlot && !event.getCursorItem().material().equals(event.getClickedItem().material()))) {
+        ItemStack clickedItem = event.getPlayer().getInventory().getCursorItem();
+        if (!(event.getClick() instanceof Click.LeftShift && event.getClick() instanceof Click.RightShift) &&
+                (!clickedItem.isAir() && event.getSlot() == resultSlot && !clickedItem.material().equals(event.getClickedItem().material()))) {
             event.setCancelled(true);
         }
     }

@@ -5,9 +5,10 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.player.PlayerPacketEvent;
+import net.minestom.server.inventory.AbstractInventory;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
-import net.minestom.server.inventory.click.ClickType;
+import net.minestom.server.inventory.click.Click;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.client.play.ClientClickWindowPacket;
@@ -20,7 +21,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class InventoryMenu {
     private static final Tag<UUID> MENU_UUID_TAG = Tag.UUID("gamesdk_menu_uuid");
-    private static final Map<Inventory, InventoryMenu> inventoryMap = Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Map<AbstractInventory, InventoryMenu> inventoryMap = Collections.synchronizedMap(new WeakHashMap<>());
 
     private final UUID inventoryUuid;
     private final Inventory inventory;
@@ -133,7 +134,7 @@ public class InventoryMenu {
             return;
         }
 
-        Inventory inventory = e.getPlayer().getOpenInventory();
+        AbstractInventory inventory = e.getPlayer().getOpenInventory();
 
         if (inventory == null || !inventoryMap.containsKey(inventory) ||
                 packet.windowId() != inventory.getWindowId() ||
@@ -149,31 +150,7 @@ public class InventoryMenu {
         }
 
         Player player = e.getPlayer();
-        if (packet.clickType() == ClientClickWindowPacket.ClickType.QUICK_MOVE) {
-            // Shift click
-
-            if (packet.button() == 0) { // Shift Left click
-                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, item, MenuClickType.SHIFT_LEFT, -1);
-
-                if (item.onShiftLeftClick != null) {
-                    item.onShiftLeftClick.accept(event);
-                } else if (item.onLeftClick != null) {
-                    item.onLeftClick.accept(event);
-                }
-            }
-            else { // Shift Right click
-                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, item, MenuClickType.SHIFT_RIGHT, -1);
-
-                if (item.onShiftRightClick != null) {
-                    item.onShiftRightClick.accept(event);
-                } else if (item.onRightClick != null) {
-                    item.onRightClick.accept(event);
-                } else if (item.onLeftClick != null) {
-                    item.onLeftClick.accept(event);
-                }
-            }
-        }
-        else if (packet.clickType() == ClientClickWindowPacket.ClickType.SWAP) {
+        if (packet.clickType() == ClientClickWindowPacket.ClickType.SWAP) {
             // Either hotbar number button or swap with offhand button
             // packet.button() is which hotbar slot it is swapped with
 
@@ -193,8 +170,8 @@ public class InventoryMenu {
 
     private static void onClick(InventoryPreClickEvent e) {
         // only continue if the player has this inventory menu open
-        Inventory inventory = e.getInventory();
-        if (inventory == null || !inventoryMap.containsKey(inventory)) {
+        AbstractInventory inventory = e.getInventory();
+        if (!inventoryMap.containsKey(inventory)) {
             return;
         }
 
@@ -214,19 +191,19 @@ public class InventoryMenu {
             return;
         }
 
-        ClickType clickType = e.getClickType();
+        Click clickType = e.getClick();
         Player player = e.getPlayer();
 
         // not all cases are handled here, some just are not possible with a vanilla client in this situation
         // and others have to be handled in the packet because this event doesn't give all the information needed
         switch (clickType) {
-            case LEFT_CLICK -> {
+            case Click.Left ignored -> {
                 if (menuItem.onLeftClick != null) {
                     menuItem.onLeftClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.LEFT, -1));
                 }
             }
 
-            case RIGHT_CLICK -> {
+            case Click.Right ignored -> {
                 if (menuItem.onRightClick != null) {
                     menuItem.onRightClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.RIGHT, -1));
                 } else if (menuItem.onLeftClick != null) {
@@ -234,18 +211,35 @@ public class InventoryMenu {
                 }
             }
 
-            case DROP -> {
+            case Click.DropSlot ignored -> {
                 if (menuItem.onDropClick != null) {
                     menuItem.onDropClick.accept(new MenuItemClickEvent(menu, player, menuItem, MenuClickType.DROP, -1));
                 }
             }
 
-            case START_SHIFT_CLICK -> {
-                // This is handled in packet listener because there is no way to identify if it was a right click
-                // or a left click that did the shift click
+            case Click.LeftShift ignored -> {
+                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, menuItem, MenuClickType.SHIFT_LEFT, -1);
+
+                if (menuItem.onShiftLeftClick != null) {
+                    menuItem.onShiftLeftClick.accept(event);
+                } else if (menuItem.onLeftClick != null) {
+                    menuItem.onLeftClick.accept(event);
+                }
             }
 
-            case CHANGE_HELD -> {
+            case Click.RightShift ignored -> {
+                MenuItemClickEvent event = new MenuItemClickEvent(menu, player, menuItem, MenuClickType.SHIFT_RIGHT, -1);
+
+                if (menuItem.onShiftRightClick != null) {
+                    menuItem.onShiftRightClick.accept(event);
+                } else if (menuItem.onRightClick != null) {
+                    menuItem.onRightClick.accept(event);
+                } else if (menuItem.onLeftClick != null) {
+                    menuItem.onLeftClick.accept(event);
+                }
+            }
+
+            case Click.HotbarSwap ignored -> {
                 // This is handled in packet listener because there is no way to identify which slot was swapped with
             }
 

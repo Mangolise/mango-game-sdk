@@ -1,10 +1,12 @@
 package net.mangolise.gamesdk;
 
 import net.hollowcube.polar.PolarLoader;
+import net.kyori.adventure.key.Key;
 import net.mangolise.gamesdk.instance.InstanceAnalysis;
 import net.mangolise.gamesdk.log.Log;
 import net.mangolise.gamesdk.log.MangoliseLogbackLayout;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.world.biome.Biome;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -16,6 +18,7 @@ public class InstanceAnalysisTest {
     public void time() throws IOException {
         MangoliseLogbackLayout.init();
         MinecraftServer.init();
+        MinecraftServer.getBiomeRegistry().register(Biome.PLAINS.key(), Biome.builder().build());
 
         PolarLoader loader = new PolarLoader(Paths.get("world.polar"));
 
