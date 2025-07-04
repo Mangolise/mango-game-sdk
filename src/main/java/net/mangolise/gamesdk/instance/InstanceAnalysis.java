@@ -104,7 +104,7 @@ public class InstanceAnalysis {
 
             if (palette.length == 1) {
                 String stateString = palette[0];
-                int stateId = namespace2stateId.computeIntIfAbsent(stateString, ignored -> safeGetStateId(stateString));
+                int stateId = namespace2stateId.computeIfAbsent(stateString, ignored -> safeGetStateId(stateString));
                 if (stateId == Block.AIR.stateId()) {
                     continue;
                 }
@@ -130,7 +130,7 @@ public class InstanceAnalysis {
 
                 // get the stateid if we haven't already
                 String namespace = palette[paletteIndex];
-                int stateId = namespace2stateId.computeIntIfAbsent(namespace, ignored -> safeGetStateId(namespace));
+                int stateId = namespace2stateId.computeIfAbsent(namespace, ignored -> safeGetStateId(namespace));
                 if (stateId == Block.AIR.stateId()) continue;
 
                 blocks.computeIfAbsent(stateId, ignored -> new ArrayList<>()).add(new Vec(absX, absY, absZ));
