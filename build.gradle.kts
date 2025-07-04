@@ -10,6 +10,7 @@ group = "net.mangolise"
 version = versionStr
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -26,7 +27,7 @@ dependencies {
     compileOnly("net.minestom:minestom-snapshots:4fe2993057")
     api("ch.qos.logback:logback-classic:1.5.7")
     api("net.kyori:adventure-text-minimessage:4.17.0")
-    api("dev.hollowcube:polar:1.14.2")
+    api("dev.hollowcube:polar:1.14.5")
 
     // gradle task
     compileOnly(gradleApi())
