@@ -59,7 +59,7 @@ public class TimeSwitcherMenu extends InventoryMenu {
         player.setTag(SELECTED_TIME_TAG, time);
         player.setTag(SELECTED_TIME_NAME_TAG, name);
 
-        TimeUpdatePacket timeUpdatePacket = new TimeUpdatePacket(worldAge, time);
+        TimeUpdatePacket timeUpdatePacket = new TimeUpdatePacket(worldAge, time, false);
         player.sendPacket(timeUpdatePacket);
         player.sendActionBar(Component.text("The time has changed to ").color(NamedTextColor.GREEN).append(Component.text(name).color(NamedTextColor.GOLD)));
         player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 2f));

@@ -13,6 +13,7 @@ import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.inventory.AbstractInventory;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.network.packet.server.play.BlockActionPacket;
@@ -84,8 +85,8 @@ public class EnderChestFeature implements Game.Feature<Game> {
         // Animation
         if (global) {
             // Animation that is for everyone in the instance
-            inv.setTag(INSTANCE_UUID, instance.getUniqueId());
-            int viewCount = viewCountMap.compute(new ViewMapKey(instance.getUniqueId(), blockPos), (k, v) -> v == null ? 1 : v + 1);
+            inv.setTag(INSTANCE_UUID, instance.getUuid());
+            int viewCount = viewCountMap.compute(new ViewMapKey(instance.getUuid(), blockPos), (k, v) -> v == null ? 1 : v + 1);
 
             Chunk chunk = instance.getChunkAt(blockPos);
             if (chunk == null || !chunk.isLoaded()) {
@@ -156,8 +157,8 @@ public class EnderChestFeature implements Game.Feature<Game> {
     }
 
     private void onInventoryClose(InventoryCloseEvent e) {
-        Inventory inv = e.getInventory();
-        if (inv == null || !inv.getTag(IS_ENDER_CHEST)) {
+        AbstractInventory inv = e.getInventory();
+        if (!inv.getTag(IS_ENDER_CHEST)) {
             return;
         }
 
@@ -218,8 +219,8 @@ public class EnderChestFeature implements Game.Feature<Game> {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof ViewMapKey viewMapKey) {
-                return instanceUuid.equals(viewMapKey.instanceUuid) && pos.equals(viewMapKey.pos);
+            if (o instanceof ViewMapKey(UUID uuid, BlockVec pos1)) {
+                return instanceUuid.equals(uuid) && pos.equals(pos1);
             }
 
             return false;
@@ -238,10 +239,10 @@ public class EnderChestFeature implements Game.Feature<Game> {
 
     public static class EnderChestCloseEvent implements PlayerEvent {
         private final Player player;
-        private final Inventory inventory;
+        private final AbstractInventory inventory;
         private final @Nullable Point enderChestPosition;
 
-        public EnderChestCloseEvent(Player player, Inventory inventory, @Nullable Point enderChestPosition) {
+        public EnderChestCloseEvent(Player player, AbstractInventory inventory, @Nullable Point enderChestPosition) {
             this.player = player;
             this.inventory = inventory;
             this.enderChestPosition = enderChestPosition;
@@ -255,7 +256,7 @@ public class EnderChestFeature implements Game.Feature<Game> {
         /**
          * @return the ender chest's inventory
          */
-        public Inventory getInventory() {
+        public AbstractInventory getInventory() {
             return inventory;
         }
 

@@ -1,10 +1,10 @@
 package net.mangolise.gamesdk.features;
 
+import net.kyori.adventure.key.Key;
 import net.mangolise.gamesdk.Game;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.instance.block.BlockHandler;
 import net.minestom.server.tag.Tag;
-import net.minestom.server.utils.NamespaceID;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -20,8 +20,8 @@ public class PlayerHeadFeature implements Game.Feature<Game> {
         INSTANCE;
 
         @Override
-        public @NotNull NamespaceID getNamespaceId() {
-            return NamespaceID.from("minecraft:skull");
+        public @NotNull Key getKey() {
+            return Key.key("minecraft:skull");
         }
 
         @Override
