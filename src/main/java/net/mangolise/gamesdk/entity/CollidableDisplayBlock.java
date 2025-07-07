@@ -164,7 +164,7 @@ public class CollidableDisplayBlock extends Entity {
     private ShulkerCollision createCollisionShulker(Point pos, double size, int interpolation) {
         LivingEntity shulker = new LivingEntity(EntityType.SHULKER);
         shulker.setInvisible(true);
-        shulker.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(size);
+        shulker.getAttribute(Attribute.SCALE).setBaseValue(size);
 
         Entity shulkerVehicle = new Entity(EntityType.BLOCK_DISPLAY);
         shulkerVehicle.editEntityMeta(BlockDisplayMeta.class, meta -> {

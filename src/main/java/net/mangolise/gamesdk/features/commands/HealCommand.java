@@ -34,7 +34,7 @@ public class HealCommand extends MangoliseCommand {
 
     private void healEntity(Entity entity) {
         if (entity instanceof LivingEntity en) {
-            en.setHealth((float) en.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+            en.setHealth((float) en.getAttribute(Attribute.MAX_HEALTH).getValue());
         }
     }
 }
