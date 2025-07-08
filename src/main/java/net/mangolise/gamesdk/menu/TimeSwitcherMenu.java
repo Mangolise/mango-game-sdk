@@ -13,32 +13,64 @@ import net.minestom.server.network.packet.server.play.TimeUpdatePacket;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
+import java.sql.Time;
+import java.util.List;
+
 public class TimeSwitcherMenu extends InventoryMenu {
+    private static final List<TimeSelection> times = List.of(
+            new TimeSelection(23000, "Sunrise", Material.CAMPFIRE),
+            new TimeSelection(26000, "Morning", Material.YELLOW_TERRACOTTA),
+            new TimeSelection(6000, "Midday", Material.SUNFLOWER),
+            new TimeSelection(10000, "Afternoon", Material.WHITE_TERRACOTTA),
+            new TimeSelection(13000, "Sunset", Material.SOUL_CAMPFIRE),
+            new TimeSelection(15200, "Early Night", Material.LIGHT_GRAY_CONCRETE),
+            new TimeSelection(18000, "Midnight", Material.NETHER_STAR),
+            new TimeSelection(20000, "Late Night", Material.GRAY_CONCRETE)
+    );
+
+    private static final Tag<Integer> SELECTED_TIME = Tag.Integer("gamesdk_selected_time").defaultValue(times.get(1).time());
+    private static final Tag<Boolean> SELECTED_TIME_MOVES = Tag.Boolean("gamesdk_selected_time_moves").defaultValue(false);
+    private static final Tag<Long> SELECTED_TIME_TIME = Tag.Long("gamesdk_selected_time_time");
+
     public static final TimeSwitcherMenu MENU = new TimeSwitcherMenu();
-    private static final Tag<Integer> SELECTED_TIME_TAG = Tag.Integer("gamesdk_selected_time").defaultValue(-26000);
-    private static final Tag<String> SELECTED_TIME_NAME_TAG = Tag.String("gamesdk_selected_time_name").defaultValue("Morning");
 
     public TimeSwitcherMenu() {
         super(InventoryType.CHEST_1_ROW, Component.text("Time Switcher").color(TextColor.color(0x119677)));
 
-        setTimeItem(0, Material.CAMPFIRE, "Sunrise", -23000, 23000);
-        setTimeItem(1, Material.YELLOW_TERRACOTTA, "Morning", -26000, 26000);
-        setTimeItem(2, Material.SUNFLOWER, "Midday", -6000, 6000);
-        setTimeItem(3, Material.WHITE_TERRACOTTA, "Afternoon", -10000, 10000);
-        setTimeItem(5, Material.SOUL_CAMPFIRE, "Sunset", -13000, 13000);
-        setTimeItem(6, Material.LIGHT_GRAY_CONCRETE, "Early Night", -15200, 15200);
-        setTimeItem(7, Material.NETHER_STAR, "Midnight", -18000, 18000);
-        setTimeItem(8, Material.GRAY_CONCRETE, "Late Night", -20000, 20000);
+        for (int i = 0; i < times.size(); i++) {
+            addTimeItem(times.get(i), i);
+        }
 
-        setMenuItem(4, Material.CLOCK, decorateText("Toggle Time Changing")).onLeftClick(e -> {
+        addMenuItem(Material.CLOCK, decorateText("Toggle Time Changing")).onLeftClick(e -> {
             Player player = e.player();
-            int time = player.updateAndGetTag(SELECTED_TIME_TAG, t -> -t);
-            setTime(e, player.getTag(SELECTED_TIME_NAME_TAG), time, time);
+            boolean timeMoves = player.updateAndGetTag(SELECTED_TIME_MOVES, t -> !t);
+            TimeSelection selection;
+            int selectedTime = player.getTag(SELECTED_TIME);
+
+            // time was previously not moving
+            if (timeMoves) {
+                selection = new TimeSelection(selectedTime, "Changes", null);
+            } else {
+                // calculate how long it has been and adjust when the time is on the clients perspective
+                // this variable is in ticks
+                long timeSinceLastChange = 0;
+                if (player.hasTag(SELECTED_TIME_TIME)) {
+                    timeSinceLastChange = (System.currentTimeMillis() - player.getTag(SELECTED_TIME_TIME)) / 50;
+                }
+
+                selection = new TimeSelection(selectedTime + (int)timeSinceLastChange, "Doesn't change", null);
+            }
+
+            setTime(player, "Time now ", selection, timeMoves);
         });
     }
 
-    private void setTimeItem(int index, Material material, String name, int time, int movingTime) {
-        setMenuItem(index, material, decorateText(name)).onLeftClick(e -> setTime(e, name, time, movingTime));
+    private void addTimeItem(TimeSelection time, int index) {
+        int slotIndex = index >= 4 ? index + 1 : index;
+        setMenuItem(slotIndex, time.material(), decorateText(time.name())).onLeftClick(e -> {
+            Player player = e.player();
+            setTime(player, "The time has changed to ", time, player.getTag(SELECTED_TIME_MOVES));
+        });
     }
 
     private Component decorateText(String text) {
@@ -47,21 +79,17 @@ public class TimeSwitcherMenu extends InventoryMenu {
                 .color(TextColor.color(0x14e3c1));
     }
 
-    private void setTime(MenuItemClickEvent e, String name, int time, int movingTime) {
-        long worldAge = e.player().getInstance().getWorldAge();
-        Player player = e.player();
+    private void setTime(Player player, String startingMessage, TimeSelection time, boolean timeMoves) {
+        player.setTag(SELECTED_TIME, time.time());
+        player.setTag(SELECTED_TIME_TIME, System.currentTimeMillis());
 
-        // make it moving time if player has moving time enabled
-        if (player.getTag(SELECTED_TIME_TAG) >= 0) {
-            time = movingTime;
-        }
+        long worldAge = player.getInstance().getWorldAge();
 
-        player.setTag(SELECTED_TIME_TAG, time);
-        player.setTag(SELECTED_TIME_NAME_TAG, name);
-
-        TimeUpdatePacket timeUpdatePacket = new TimeUpdatePacket(worldAge, time, false);
+        TimeUpdatePacket timeUpdatePacket = new TimeUpdatePacket(worldAge, time.time(), timeMoves);
         player.sendPacket(timeUpdatePacket);
-        player.sendActionBar(Component.text("The time has changed to ").color(NamedTextColor.GREEN).append(Component.text(name).color(NamedTextColor.GOLD)));
+        player.sendActionBar(Component.text(startingMessage).color(NamedTextColor.GREEN).append(Component.text(time.name()).color(NamedTextColor.GOLD)));
         player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 2f));
     }
+    
+    private record TimeSelection(int time, String name, Material material) {}
 }
