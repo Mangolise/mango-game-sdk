@@ -24,7 +24,7 @@ tasks.withType<JavaCompile> {
 }
 
 dependencies {
-    compileOnly("net.minestom:minestom:2025.07.03-1.21.5")
+    compileOnly("net.minestom:minestom:2025.07.10b-1.21.7")
     api("ch.qos.logback:logback-classic:1.5.13")
     api("net.kyori:adventure-text-minimessage:4.17.0")
     api("dev.hollowcube:polar:1.14.5")
@@ -33,7 +33,7 @@ dependencies {
     compileOnly(gradleApi())
 
     // tests
-    testImplementation("net.minestom:minestom:2025.07.03-1.21.5")
+    testImplementation("net.minestom:minestom:2025.07.10b-1.21.7")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
