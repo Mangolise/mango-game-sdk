@@ -141,17 +141,10 @@ public class CollidableDisplayBlock extends Entity {
         // Optimisation: first shulker can ride the shulker for displaying the block and we can use a transform offset
         // to display it at the correct position
         {
-            {
-                ShulkerCollision shulker = shulkers.removeFirst();
-                shulker.vehicle.remove();
-                firstShulker = shulker.shulker;
-                firstOffset = shulker.offset;
-            }
-
-            // setInstance runs teleport if the block is already in this instance
-            setInstance(instance, position).thenAccept(ignored -> this.addPassenger(firstShulker));
-
-            this.editEntityMeta(BlockDisplayMeta.class, meta -> meta.setTranslation(firstOffset.mul(-1)));
+            ShulkerCollision shulker = shulkers.removeFirst();
+            shulker.vehicle.remove();
+            firstShulker = shulker.shulker;
+            firstOffset = shulker.offset;
         }
 
         // place shulkers in world on top of display block entities so that they don't snap to blocks
@@ -161,6 +154,10 @@ public class CollidableDisplayBlock extends Entity {
             shulker.vehicle.setInstance(instance, spawnPos).thenAccept(ignored ->
                     shulker.vehicle.addPassenger(shulker.shulker));
         }
+
+        // setInstance runs teleport if the block is already in this instance
+        setInstance(instance, position).thenAccept(ignored -> this.addPassenger(firstShulker));
+        this.editEntityMeta(BlockDisplayMeta.class, meta -> meta.setTranslation(firstOffset.mul(-1)));
 
         setup = false;
     }
