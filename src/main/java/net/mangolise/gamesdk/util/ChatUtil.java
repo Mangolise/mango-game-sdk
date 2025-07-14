@@ -31,6 +31,7 @@ public class ChatUtil {
 
         NamedTextColor color = NamedTextColor.WHITE;
         TextDecoration decoration = null;
+        boolean reset = false;
         for (int i = 0; i < message.length(); i++) {
             if (message.charAt(i) != COLOR_CHAR || !VALID_COLORS.contains(String.valueOf(message.charAt(i + 1)))) {
                 currentSection.append(message.charAt(i));
@@ -39,7 +40,7 @@ public class ChatUtil {
 
             // Apply prev section
             if (!currentSection.isEmpty()) {
-                component = applyComponent(component, currentSection, color, decoration);
+                component = applyComponent(component, currentSection, color, decoration, reset);
                 currentSection = new StringBuilder();
             }
 
@@ -63,7 +64,8 @@ public class ChatUtil {
                 case 'c' -> color = NamedTextColor.RED;
                 case 'd' -> color = NamedTextColor.LIGHT_PURPLE;
                 case 'e' -> color = NamedTextColor.YELLOW;
-                case 'f', 'r' -> color = NamedTextColor.WHITE;
+                case 'f' -> color = NamedTextColor.WHITE;
+                case 'r' -> reset = true; // Reset all styles
                 case 'k' -> decoration = TextDecoration.OBFUSCATED;
                 case 'l' -> decoration = TextDecoration.BOLD;
                 case 'm' -> decoration = TextDecoration.STRIKETHROUGH;
@@ -73,7 +75,7 @@ public class ChatUtil {
         }
 
         if (!currentSection.isEmpty()) {
-            component = applyComponent(component, currentSection, color, decoration);
+            component = applyComponent(component, currentSection, color, decoration, reset);
         }
 
         return component;
@@ -101,12 +103,22 @@ public class ChatUtil {
         };
     }
 
-    private static Component applyComponent(Component component, StringBuilder currentSection, NamedTextColor color, TextDecoration decoration) {
+    private static Component applyComponent(Component component, StringBuilder currentSection, NamedTextColor color, TextDecoration decoration, boolean reset) {
         if (decoration == null) {
-            return component.append(Component.text(currentSection.toString(), color));
+            Component c = component.append(Component.text(currentSection.toString(), color));
+            return reset ? resetStyles(c) : c;
         } else {
-            return component.append(Component.text(currentSection.toString(), color, decoration));
+            Component c = component.append(Component.text(currentSection.toString(), color, decoration));
+            return reset ? resetStyles(c) : c;
         }
+    }
+
+    private static Component resetStyles(Component component) {
+        return component.decoration(TextDecoration.BOLD, false)
+                .decoration(TextDecoration.ITALIC, false)
+                .decoration(TextDecoration.OBFUSCATED, false)
+                .decoration(TextDecoration.STRIKETHROUGH, false)
+                .decoration(TextDecoration.UNDERLINED, false);
     }
 
     public static Component getDisplayName(Player player) {
