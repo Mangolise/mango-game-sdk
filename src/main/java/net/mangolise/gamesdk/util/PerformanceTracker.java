@@ -40,7 +40,10 @@ public class PerformanceTracker {
         }
 
         long elapsed = now - oldest;
-        return ((double) tickTimes.length) / ((double) elapsed / 1_000_000_000.0D);
+
+        // get the total ticks and then divide by the amount of instances
+        return (((double) tickTimes.length) / ((double) elapsed / 1_000_000_000.0D)) /
+                MinecraftServer.getInstanceManager().getInstances().size();
     }
 
     /**
