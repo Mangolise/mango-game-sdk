@@ -8,6 +8,7 @@ import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.extras.bungee.BungeeCordProxy;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class IntegrationTest {
         if (GameSdkUtils.useBungeeCord()) {
             BungeeCordProxy.enable();
         }
+
+        MojangAuth.init();
 
         CustomTabList tabList = new CustomTabList();
         tabList.setHeader(ChatUtil.toComponent("&6&lPOTATO"));

@@ -23,7 +23,7 @@ public class CustomTabList {
     private final Set<Player> players = new HashSet<>();
     private final List<SendablePacket> packetsToIgnore = new ArrayList<>();
     private Function<Player, List<TabListEntry>> entriesProvider = player -> MinecraftServer.getConnectionManager().getOnlinePlayers().stream()
-            .map(p -> new TabListEntry(p.getUuid(), Component.text(p.getUsername()), p.getLatency(), p.getGameMode()))
+            .map(p -> new TabListEntry(p.getUuid(), Component.text(p.getUsername()), p.getLatency(), p.getGameMode(), p.getUsername(), null))
             .toList();
 
     public void addPlayer(Player player) {
@@ -31,8 +31,26 @@ public class CustomTabList {
 
         // We need to remove any existing players that are in the tab list for this player
         // let's assume that every player in the server has a tab list entry
+        // this code sets visible to false for all players in the server
         List<UUID> playerUuids = MinecraftServer.getConnectionManager().getOnlinePlayers().stream().map(Entity::getUuid).toList();
-        PlayerInfoRemovePacket removePacket = new PlayerInfoRemovePacket(playerUuids);
+        PlayerInfoUpdatePacket.Entry[] entries = playerUuids.stream()
+                .map(uuid -> new PlayerInfoUpdatePacket.Entry(
+                        uuid,
+                        "CoPokBl", // Placeholder username
+                        List.of(), // No properties
+                        false, // Visible
+                        0, // Latency
+                        null, // Game mode
+                        null, // Display name
+                        null, // Chat session
+                        0 // Default list order
+                ))
+                .toArray(PlayerInfoUpdatePacket.Entry[]::new);
+        PlayerInfoUpdatePacket removePacket = new PlayerInfoUpdatePacket(
+                EnumSet.of(PlayerInfoUpdatePacket.Action.UPDATE_LISTED),
+                Arrays.asList(entries)
+        );
+        packetsToIgnore.add(removePacket);
         player.sendPacket(removePacket);
 
         // Now we can add our entries to the tab list
@@ -113,8 +131,10 @@ public class CustomTabList {
         for (TabListEntry entry : entries) {
             packetEntries.add(new PlayerInfoUpdatePacket.Entry(
                     entry.uuid(),
-                    "asd",
-                    Collections.emptyList(), // No properties
+                    entry.username(),  // not actually used by the client
+                    entry.skin() == null ? List.of() : List.of(
+                            new PlayerInfoUpdatePacket.Property("textures", entry.skin().textures(), entry.skin().signature())
+                    ),
                     true, // Visible
                     entry.latency(),
                     entry.gameMode(),
