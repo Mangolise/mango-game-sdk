@@ -12,6 +12,6 @@ public class NoCollisionFeature implements Game.Feature<Game> {
         Team team = MinecraftServer.getTeamManager().createTeam("no_collision");
         team.setCollisionRule(TeamsPacket.CollisionRule.NEVER);
 
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, e -> e.getPlayer().setTeam(team));
+        context.eventNode().addListener(PlayerSpawnEvent.class, e -> e.getPlayer().setTeam(team));
     }
 }

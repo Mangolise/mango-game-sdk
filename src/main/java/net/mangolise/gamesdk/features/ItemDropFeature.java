@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ItemDropFeature implements Game.Feature<Game> {
     @Override
     public void setup(Context<Game> context) {
-        MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, this::itemDrop);
+        context.eventNode().addListener(ItemDropEvent.class, this::itemDrop);
     }
 
     private void itemDrop(@NotNull ItemDropEvent event) {

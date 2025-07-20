@@ -2,7 +2,6 @@ package net.mangolise.gamesdk.features;
 
 import net.mangolise.gamesdk.Game;
 import net.mangolise.gamesdk.features.crafting.CraftingRecipe;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.inventory.InventoryClickEvent;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
@@ -33,9 +32,9 @@ public class CraftingFeature implements Game.Feature<Game> {
 
     @Override
     public void setup(Context<Game> context) {
-        MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, this::invPreClick);
-        MinecraftServer.getGlobalEventHandler().addListener(InventoryClickEvent.class, this::invClick);
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerBlockInteractEvent.class, this::blockInteract);
+        context.eventNode().addListener(InventoryPreClickEvent.class, this::invPreClick);
+        context.eventNode().addListener(InventoryClickEvent.class, this::invClick);
+        context.eventNode().addListener(PlayerBlockInteractEvent.class, this::blockInteract);
     }
 
     private void blockInteract(@NotNull PlayerBlockInteractEvent event) {

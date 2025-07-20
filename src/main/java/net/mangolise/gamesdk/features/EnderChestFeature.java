@@ -50,7 +50,7 @@ public class EnderChestFeature implements Game.Feature<Game> {
 
     @Override
     public void setup(Context<Game> context) {
-        MinecraftServer.getGlobalEventHandler().addListener(InventoryCloseEvent.class, this::onInventoryClose);
+        context.eventNode().addListener(InventoryCloseEvent.class, this::onInventoryClose);
         MinecraftServer.getSchedulerManager().scheduleTask(this::every5Ticks, TaskSchedule.millis(250), TaskSchedule.millis(250));
     }
 

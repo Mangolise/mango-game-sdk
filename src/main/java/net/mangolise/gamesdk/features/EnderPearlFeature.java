@@ -1,7 +1,6 @@
 package net.mangolise.gamesdk.features;
 
 import net.mangolise.gamesdk.Game;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
@@ -18,7 +17,7 @@ public class EnderPearlFeature implements Game.Feature<Game> {
 
     @Override
     public void setup(Context<Game> context) {
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerUseItemEvent.class, this::useItem);
+        context.eventNode().addListener(PlayerUseItemEvent.class, this::useItem);
     }
 
     private void useItem(@NotNull PlayerUseItemEvent event) {

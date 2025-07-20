@@ -2,7 +2,6 @@ package net.mangolise.gamesdk.features;
 
 import net.mangolise.gamesdk.Game;
 import net.mangolise.gamesdk.util.GameSdkUtils;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.Damage;
 import net.minestom.server.entity.damage.DamageType;
@@ -19,7 +18,7 @@ public class LavaHurtFeature implements Game.Feature<Game> {
 
     @Override
     public void setup(Context<Game> context) {
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerTickEvent.class, this::playerTick);
+        context.eventNode().addListener(PlayerTickEvent.class, this::playerTick);
     }
 
     private void playerTick(@NotNull PlayerTickEvent event) {
