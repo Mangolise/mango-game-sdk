@@ -1,12 +1,15 @@
 package net.mangolise.gamesdk.features;
 
 import net.mangolise.gamesdk.Game;
+import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.component.DataComponent;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.inventory.InventoryCloseEvent;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
+import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.PlayerEntityInteractEvent;
 import net.minestom.server.inventory.*;
 import net.minestom.server.inventory.click.Click;
@@ -18,6 +21,7 @@ import net.minestom.server.network.packet.server.play.*;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.NotNull;
 
+import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -172,6 +176,26 @@ public class VillagerTradeFeature implements Game.Feature<Game> {
                     }
                 });
             }
+        });
+
+        context.eventNode().addListener(InventoryCloseEvent.class, e -> {
+            if (!(e.getInventory() instanceof VillagerInventory inv)) {
+                return;
+            }
+
+            Player player = e.getPlayer();
+
+            Stream.of(INGREDIENT_SLOT_0, INGREDIENT_SLOT_1).forEach(slot -> {
+                ItemStack item = inv.getItemStack(slot);
+
+                if (!item.isAir()) {
+                    ItemStack remaining = player.getInventory().addItemStack(item, TransactionOption.ALL);
+                    if (!remaining.isAir()) {
+                        ItemDropEvent event = new ItemDropEvent(player, remaining);
+                        EventDispatcher.call(event);
+                    }
+                }
+            });
         });
 
         // This is needed for the ClientSelectTradePacket

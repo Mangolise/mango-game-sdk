@@ -10,14 +10,18 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.MetadataDef;
+import net.minestom.server.event.item.PickupItemEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerBlockInteractEvent;
 import net.minestom.server.event.player.PlayerEntityInteractEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.WorldBorder;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.inventory.type.VillagerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.network.packet.server.play.TradeListPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -43,12 +47,36 @@ public class IntegrationGame extends BaseGame<IntegrationGame.Config> {
         Entity entity = new Entity(EntityType.MINECART);
         entity.setInstance(instance, new Pos(0, 2, 0));
 
+        Entity entityVil = new Entity(EntityType.VILLAGER);
+        entityVil.setInstance(instance, new Pos(0, 2, 2));
+
         instance.enableAutoChunkLoad(true);
         instance.setWorldBorder(new WorldBorder(100 * 2, 0, 0, 10, 15));
 
         MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, e -> e.setSpawningInstance(instance));
         MinecraftServer.getGlobalEventHandler().addListener(PlayerAttemptDismountEvent.class, e -> e.getPlayer().sendMessage("Good job i work"));
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerEntityInteractEvent.class, e -> e.getTarget().addPassenger(e.getPlayer()));
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerEntityInteractEvent.class, e -> {
+            if (e.getTarget().getEntityType() == EntityType.VILLAGER) {
+                VillagerInventory inventory = new VillagerInventory("hallo");
+                inventory.addTrade(new TradeListPacket.Trade(
+                        ItemStack.of(Material.STICK),
+                        ItemStack.of(Material.DIAMOND),
+                        ItemStack.of(Material.AIR),
+                        false,
+                        0,
+                        1,
+                        1,
+                        0,
+                        1.0f,
+                        0
+                ));
+
+                e.getPlayer().openInventory(inventory);
+                return;
+            }
+
+            e.getTarget().addPassenger(e.getPlayer());
+        });
         MinecraftServer.getGlobalEventHandler().addListener(PlayerBlockInteractEvent.class, e -> {
             if (e.getBlock().compare(Block.ENDER_CHEST)) {
                 EnderChestFeature.open(e.getPlayer());
@@ -240,6 +268,9 @@ public class IntegrationGame extends BaseGame<IntegrationGame.Config> {
                 new ExtraEventsFeature(),
                 new AdminCommandsFeature(),
                 new EnderChestFeature(),
+                new VillagerTradeFeature(),
+                new ItemDropFeature(),
+                new ItemPickupFeature(),
                 new CraftingFeature(recipeList)
         );
     }
