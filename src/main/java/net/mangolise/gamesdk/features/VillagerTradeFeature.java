@@ -184,6 +184,7 @@ public class VillagerTradeFeature implements Game.Feature<Game> {
             }
 
             Player player = e.getPlayer();
+            player.removeTag(SELECTED_TRADE);
 
             Stream.of(INGREDIENT_SLOT_0, INGREDIENT_SLOT_1).forEach(slot -> {
                 ItemStack item = inv.getItemStack(slot);
@@ -220,10 +221,6 @@ public class VillagerTradeFeature implements Game.Feature<Game> {
             List<ItemStack> items = tryTakeItemStacks(List.of(inv, playerInventory), List.of(itemCost1, itemCost2));
             inv.setItemStack(INGREDIENT_SLOT_0, items.getFirst());
             inv.setItemStack(INGREDIENT_SLOT_1, items.get(1));
-        });
-
-        context.eventNode().addListener(InventoryCloseEvent.class, e -> {
-            e.getPlayer().removeTag(SELECTED_TRADE);
         });
     }
 }
