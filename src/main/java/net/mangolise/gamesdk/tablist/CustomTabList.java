@@ -23,7 +23,7 @@ public class CustomTabList {
     private final Set<Player> players = new HashSet<>();
     private final List<SendablePacket> packetsToIgnore = new ArrayList<>();
     private Function<Player, List<TabListEntry>> entriesProvider = player -> MinecraftServer.getConnectionManager().getOnlinePlayers().stream()
-            .map(p -> new TabListEntry(p.getUuid(), Component.text(p.getUsername()), p.getLatency(), p.getGameMode(), p.getUsername(), null))
+            .map(p -> new TabListEntry(p.getUuid(), Component.text(p.getUsername()), p.getLatency(), p.getGameMode(), p.getUsername(), null, true))
             .toList();
 
     public void addPlayer(Player player) {
@@ -43,7 +43,8 @@ public class CustomTabList {
                         null, // Game mode
                         null, // Display name
                         null, // Chat session
-                        0 // Default list order
+                        0, // Default list order
+                        true
                 ))
                 .toArray(PlayerInfoUpdatePacket.Entry[]::new);
         PlayerInfoUpdatePacket removePacket = new PlayerInfoUpdatePacket(
@@ -89,7 +90,8 @@ public class CustomTabList {
                     entry.gameMode(),
                     entry.displayName(),
                     entry.chatSession(),
-                    entry.listOrder()));
+                    entry.listOrder(),
+                    entry.displayHat()));
         }
         return newEntries;
     }
@@ -140,7 +142,8 @@ public class CustomTabList {
                     entry.gameMode(),
                     entry.text(), // No display name
                     null, // No chat session
-                    priority-- // Default list order
+                    priority--, // Default list order
+                    entry.displayHat()
             ));
         }
         return packetEntries;

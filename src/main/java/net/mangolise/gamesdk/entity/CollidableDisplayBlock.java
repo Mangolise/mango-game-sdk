@@ -66,7 +66,7 @@ public class CollidableDisplayBlock extends Entity {
             Shape shape = block.registry().collisionShape();
             switch (shape) {
                 case BoundingBox box -> this.collision = Collections.singletonList(box);
-                case ShapeImpl impl -> this.collision = impl.collisionBoundingBoxes();
+                case ShapeImpl impl -> this.collision = impl.boundingBoxes();
                 default -> throw new IllegalStateException(shape.getClass().getSimpleName() + " is a supported block collision shape");
             }
         } else {

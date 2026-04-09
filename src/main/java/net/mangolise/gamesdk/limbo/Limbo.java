@@ -9,7 +9,7 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.trait.PlayerEvent;
-import net.minestom.server.instance.IChunkLoader;
+import net.minestom.server.instance.ChunkLoader;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +26,7 @@ public class Limbo {
     private static Instance instance;
 
     static {
-        instance = MinecraftServer.getInstanceManager().createInstanceContainer((IChunkLoader) null);
+        instance = MinecraftServer.getInstanceManager().createInstanceContainer((ChunkLoader) null);
 
         instance.eventNode().addListener(PlayerSpawnEvent.class, event -> {
             if (!event.isFirstSpawn()) return;

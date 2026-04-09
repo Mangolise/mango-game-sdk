@@ -1,10 +1,5 @@
 package net.mangolise.gamesdk.instance;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.hollowcube.polar.PolarChunk;
 import net.hollowcube.polar.PolarSection;
 import net.hollowcube.polar.PolarWorld;
@@ -15,6 +10,11 @@ import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.block.Block;
+import org.gradle.internal.impldep.it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import org.gradle.internal.impldep.it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import org.gradle.internal.impldep.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.gradle.internal.impldep.it.unimi.dsi.fastutil.objects.Object2IntMap;
+import org.gradle.internal.impldep.it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
